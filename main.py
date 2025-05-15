@@ -3,7 +3,8 @@ import logging
 from datetime import datetime
 from collections import Counter, defaultdict
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify, flash
-from utils.blockchain import get_user_transactions
+from utils.blockchain import get_user_transactions as get_mock_transactions
+from utils.etherscan_api import get_transaction_history, get_ether_balance, get_transaction_details
 from utils.classifier import classify_address
 from models import db, FlaggedTransaction
 
@@ -68,8 +69,24 @@ def dashboard():
         flash('Please login first', 'warning')
         return redirect(url_for('login'))
     
-    # Get transactions for this address
-    transactions = get_user_transactions(wallet_address)
+    # Get real transactions from Etherscan API
+    try:
+        transactions = get_transaction_history(wallet_address)
+        
+        # Fallback to mock data if no transactions or API error
+        if not transactions:
+            logging.warning(f"No transactions found for {wallet_address} from Etherscan API, using mock data")
+            transactions = get_mock_transactions(wallet_address)
+    except Exception as e:
+        logging.error(f"Error fetching transactions from Etherscan: {str(e)}")
+        # Fallback to mock data
+        transactions = get_mock_transactions(wallet_address)
+    
+    # Get current balance
+    try:
+        balance = get_ether_balance(wallet_address)
+    except Exception:
+        balance = 0
     
     # Classify the address based on transactions
     category = classify_address(transactions)
@@ -90,7 +107,8 @@ def dashboard():
     return render_template('dashboard.html', 
                           wallet_address=wallet_address, 
                           transactions=transactions,
-                          category=category)
+                          category=category,
+                          balance=balance)
 
 @app.route('/classify', methods=['POST'])
 def classify():
@@ -200,9 +218,23 @@ def flag_transaction():
         flagged = False
         reason = None
     else:
-        # Get transaction details for additional context
-        transactions = get_user_transactions(wallet_address)
-        tx_details = next((tx for tx in transactions if tx['tx_hash'] == tx_hash), None)
+        # Try to get transaction details from Etherscan first
+        try:
+            tx_details = get_transaction_details(tx_hash)
+        except Exception as e:
+            logging.error(f"Error fetching transaction details from Etherscan: {str(e)}")
+            tx_details = None
+            
+        # If not found, fallback to mock or recent transactions
+        if not tx_details:
+            try:
+                transactions = get_transaction_history(wallet_address)
+                if not transactions:
+                    transactions = get_mock_transactions(wallet_address)
+                tx_details = next((tx for tx in transactions if tx['tx_hash'] == tx_hash), None)
+            except Exception:
+                transactions = get_mock_transactions(wallet_address)
+                tx_details = next((tx for tx in transactions if tx['tx_hash'] == tx_hash), None)
         
         # Create new flag
         new_flag = FlaggedTransaction()

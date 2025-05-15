@@ -11,8 +11,8 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trustmark-dev-secret")
 
-# Store flagged transactions in memory
-flagged_transactions = set()
+# Store flagged transactions in memory with reasons
+flagged_transactions = {}
 
 @app.route('/')
 def index():
@@ -48,9 +48,14 @@ def dashboard():
     # Classify the address based on transactions
     category = classify_address(transactions)
     
-    # Check which transactions are flagged
+    # Check which transactions are flagged and add reason if flagged
     for tx in transactions:
-        tx['flagged'] = tx['tx_hash'] in flagged_transactions
+        if tx['tx_hash'] in flagged_transactions:
+            tx['flagged'] = True
+            tx['flag_reason'] = flagged_transactions[tx['tx_hash']]
+        else:
+            tx['flagged'] = False
+            tx['flag_reason'] = None
     
     return render_template('dashboard.html', 
                           wallet_address=wallet_address, 
@@ -71,19 +76,28 @@ def classify():
 def flag_transaction():
     """API endpoint to flag a transaction"""
     tx_hash = request.form.get('tx_hash')
+    flag_reason = request.form.get('flag_reason', 'suspicious')
     
     if not tx_hash:
         return jsonify({'success': False, 'message': 'No transaction hash provided'}), 400
     
-    # Toggle flag status
+    # Store or remove flag with reason
+    # We're using a dictionary of tx_hash -> reason instead of a simple set
     if tx_hash in flagged_transactions:
-        flagged_transactions.remove(tx_hash)
+        del flagged_transactions[tx_hash]
         flagged = False
+        reason = None
     else:
-        flagged_transactions.add(tx_hash)
+        flagged_transactions[tx_hash] = flag_reason
         flagged = True
+        reason = flag_reason
     
-    return jsonify({'success': True, 'flagged': flagged, 'tx_hash': tx_hash})
+    return jsonify({
+        'success': True, 
+        'flagged': flagged, 
+        'tx_hash': tx_hash,
+        'reason': reason
+    })
 
 @app.route('/logout')
 def logout():

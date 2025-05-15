@@ -121,15 +121,30 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-warning flag-btn" 
-                                                    data-tx-hash="{{ tx.tx_hash }}"
-                                                    data-flagged="{{ tx.flagged|lower }}">
-                                                {% if tx.flagged %}
-                                                    <i class="fa fa-flag text-warning"></i> Flagged
-                                                {% else %}
-                                                    <i class="fa fa-flag-o"></i> Flag
-                                                {% endif %}
-                                            </button>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm {% if tx.flagged %}btn-warning{% else %}btn-outline-warning{% endif %} dropdown-toggle flag-btn" 
+                                                        type="button" id="flagDropdown{{ loop.index }}" 
+                                                        data-bs-toggle="dropdown" 
+                                                        aria-expanded="false"
+                                                        data-tx-hash="{{ tx.tx_hash }}"
+                                                        data-flagged="{{ tx.flagged|lower }}">
+                                                    {% if tx.flagged %}
+                                                        <i class="fa fa-flag"></i> Flagged: {{ tx.flag_reason|capitalize }}
+                                                    {% else %}
+                                                        <i class="fa fa-flag-o"></i> Flag
+                                                    {% endif %}
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="flagDropdown{{ loop.index }}">
+                                                    {% if tx.flagged %}
+                                                        <li><button class="dropdown-item unflag-option" data-tx-hash="{{ tx.tx_hash }}"><i class="fa fa-times"></i> Remove Flag</button></li>
+                                                    {% else %}
+                                                        <li><button class="dropdown-item flag-option" data-tx-hash="{{ tx.tx_hash }}" data-reason="suspicious"><i class="fa fa-exclamation-triangle"></i> Suspicious</button></li>
+                                                        <li><button class="dropdown-item flag-option" data-tx-hash="{{ tx.tx_hash }}" data-reason="scam"><i class="fa fa-ban"></i> Scam</button></li>
+                                                        <li><button class="dropdown-item flag-option" data-tx-hash="{{ tx.tx_hash }}" data-reason="phishing"><i class="fa fa-user-secret"></i> Phishing</button></li>
+                                                        <li><button class="dropdown-item flag-option" data-tx-hash="{{ tx.tx_hash }}" data-reason="fraud"><i class="fa fa-warning"></i> Fraud</button></li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -219,16 +234,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Flag button click handler
-            const flagButtons = document.querySelectorAll('.flag-btn');
-            flagButtons.forEach(button => {
-                button.addEventListener('click', function() {
+            // Flag option click handlers
+            const flagOptions = document.querySelectorAll('.flag-option');
+            flagOptions.forEach(option => {
+                option.addEventListener('click', function() {
                     const txHash = this.getAttribute('data-tx-hash');
-                    const isFlagged = this.getAttribute('data-flagged') === 'true';
+                    const reason = this.getAttribute('data-reason');
                     
-                    // Send flag request
+                    // Send flag request with reason
                     const formData = new FormData();
                     formData.append('tx_hash', txHash);
+                    formData.append('flag_reason', reason);
                     
                     fetch('/flag_tx', {
                         method: 'POST',
@@ -237,14 +253,21 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            // Get the parent dropdown button
+                            const dropdownBtn = document.querySelector(`.flag-btn[data-tx-hash="${txHash}"]`);
+                            
                             // Update button UI
-                            if (data.flagged) {
-                                this.innerHTML = '<i class="fa fa-flag text-warning"></i> Flagged';
-                                this.setAttribute('data-flagged', 'true');
-                            } else {
-                                this.innerHTML = '<i class="fa fa-flag-o"></i> Flag';
-                                this.setAttribute('data-flagged', 'false');
-                            }
+                            dropdownBtn.innerHTML = `<i class="fa fa-flag"></i> Flagged: ${data.reason.charAt(0).toUpperCase() + data.reason.slice(1)}`;
+                            dropdownBtn.setAttribute('data-flagged', 'true');
+                            dropdownBtn.classList.remove('btn-outline-warning');
+                            dropdownBtn.classList.add('btn-warning');
+                            
+                            // Update dropdown menu
+                            const dropdownMenu = dropdownBtn.nextElementSibling;
+                            dropdownMenu.innerHTML = `<li><button class="dropdown-item unflag-option" data-tx-hash="${txHash}"><i class="fa fa-times"></i> Remove Flag</button></li>`;
+                            
+                            // Add event listener to the new unflag option
+                            attachUnflagListeners();
                             
                             // Update flagged transactions section
                             updateFlaggedTransactionsView();
@@ -256,6 +279,108 @@
                     });
                 });
             });
+            
+            // Function to attach unflag event listeners
+            function attachUnflagListeners() {
+                const unflagOptions = document.querySelectorAll('.unflag-option');
+                unflagOptions.forEach(option => {
+                    if (!option.hasEventListener) {
+                        option.hasEventListener = true;  // Mark to prevent duplicate listeners
+                        option.addEventListener('click', function() {
+                            const txHash = this.getAttribute('data-tx-hash');
+                            
+                            // Send unflag request
+                            const formData = new FormData();
+                            formData.append('tx_hash', txHash);
+                            
+                            fetch('/flag_tx', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Get the parent dropdown button
+                                    const dropdownBtn = document.querySelector(`.flag-btn[data-tx-hash="${txHash}"]`);
+                                    
+                                    // Update button UI
+                                    dropdownBtn.innerHTML = '<i class="fa fa-flag-o"></i> Flag';
+                                    dropdownBtn.setAttribute('data-flagged', 'false');
+                                    dropdownBtn.classList.remove('btn-warning');
+                                    dropdownBtn.classList.add('btn-outline-warning');
+                                    
+                                    // Update dropdown menu with flag options
+                                    const dropdownMenu = dropdownBtn.nextElementSibling;
+                                    dropdownMenu.innerHTML = `
+                                        <li><button class="dropdown-item flag-option" data-tx-hash="${txHash}" data-reason="suspicious"><i class="fa fa-exclamation-triangle"></i> Suspicious</button></li>
+                                        <li><button class="dropdown-item flag-option" data-tx-hash="${txHash}" data-reason="scam"><i class="fa fa-ban"></i> Scam</button></li>
+                                        <li><button class="dropdown-item flag-option" data-tx-hash="${txHash}" data-reason="phishing"><i class="fa fa-user-secret"></i> Phishing</button></li>
+                                        <li><button class="dropdown-item flag-option" data-tx-hash="${txHash}" data-reason="fraud"><i class="fa fa-warning"></i> Fraud</button></li>
+                                    `;
+                                    
+                                    // Add event listeners to the new flag options
+                                    document.querySelectorAll(`.flag-option[data-tx-hash="${txHash}"]`).forEach(el => {
+                                        el.addEventListener('click', flagOptionClickHandler);
+                                    });
+                                    
+                                    // Update flagged transactions section
+                                    updateFlaggedTransactionsView();
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('Failed to update flag status');
+                            });
+                        });
+                    }
+                });
+            }
+            
+            // Function for flag option click handling (to allow reattaching)
+            function flagOptionClickHandler() {
+                const txHash = this.getAttribute('data-tx-hash');
+                const reason = this.getAttribute('data-reason');
+                
+                // Send flag request with reason
+                const formData = new FormData();
+                formData.append('tx_hash', txHash);
+                formData.append('flag_reason', reason);
+                
+                fetch('/flag_tx', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Get the parent dropdown button
+                        const dropdownBtn = document.querySelector(`.flag-btn[data-tx-hash="${txHash}"]`);
+                        
+                        // Update button UI
+                        dropdownBtn.innerHTML = `<i class="fa fa-flag"></i> Flagged: ${data.reason.charAt(0).toUpperCase() + data.reason.slice(1)}`;
+                        dropdownBtn.setAttribute('data-flagged', 'true');
+                        dropdownBtn.classList.remove('btn-outline-warning');
+                        dropdownBtn.classList.add('btn-warning');
+                        
+                        // Update dropdown menu
+                        const dropdownMenu = dropdownBtn.nextElementSibling;
+                        dropdownMenu.innerHTML = `<li><button class="dropdown-item unflag-option" data-tx-hash="${txHash}"><i class="fa fa-times"></i> Remove Flag</button></li>`;
+                        
+                        // Add event listener to the new unflag option
+                        attachUnflagListeners();
+                        
+                        // Update flagged transactions section
+                        updateFlaggedTransactionsView();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update flag status');
+                });
+            }
+            
+            // Initialize by attaching unflag listeners
+            attachUnflagListeners();
             
             // Update flagged transactions view
             function updateFlaggedTransactionsView() {
@@ -281,7 +406,10 @@
                                     <div class="text-truncate" style="max-width: 150px;">${txHash}</div>
                                     <small>${direction} ${amount}</small>
                                 </div>
-                                <span class="badge bg-warning">Flagged</span>
+                                <div>
+                                    <span class="badge bg-warning">Flagged</span>
+                                    <span class="badge bg-secondary">{{ getFlagReasonText(btn) }}</span>
+                                </div>
                             </div>
                         </li>
                     `;

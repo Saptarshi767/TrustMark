@@ -29,6 +29,9 @@
                         <a class="nav-link" href="{{ url_for('flagged_stats') }}">Flagged Stats</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('search') }}">Search</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                     </li>
                 </ul>
@@ -54,9 +57,14 @@
                             <i class="fa fa-wallet me-1"></i> {{ wallet_address }}
                         </span>
                     </div>
-                    <div>
+                    <div class="me-3">
                         <span class="badge bg-primary p-2">
                             <i class="fa fa-tag me-1"></i> {{ category }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="badge bg-success p-2">
+                            <i class="fa fa-ethereum me-1"></i> {{ balance }} ETH
                         </span>
                     </div>
                 </div>
@@ -64,6 +72,10 @@
                     <div class="alert alert-info">
                         <i class="fa fa-database me-1"></i> Flagged transactions are now stored in a database! 
                         <a href="{{ url_for('flagged_stats') }}" class="alert-link">View Statistics <i class="fa fa-arrow-right"></i></a>
+                    </div>
+                    <div class="alert alert-success">
+                        <i class="fa fa-exchange me-1"></i> <strong>We're now using real Etherscan data!</strong> 
+                        Displaying actual transactions from the Ethereum blockchain.
                     </div>
                 </div>
             </div>
@@ -103,7 +115,12 @@
                             {% if transactions %}
                                 {% for tx in transactions %}
                                     <tr id="tx-{{ tx.tx_hash }}">
-                                        <td class="text-truncate" style="max-width: 150px;">{{ tx.tx_hash }}</td>
+                                        <td class="text-truncate" style="max-width: 150px;">
+                                            <a href="{{ url_for('transaction_details', tx_hash=tx.tx_hash) }}" class="text-decoration-none">
+                                                {{ tx.tx_hash }}
+                                                <i class="fa fa-external-link ms-1 small"></i>
+                                            </a>
+                                        </td>
                                         <td>
                                             {% if tx.direction == 'in' %}
                                                 <span class="text-success">+{{ tx.amount }}</span>

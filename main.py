@@ -259,6 +259,104 @@ def flag_transaction():
         'reason': reason
     })
 
+@app.route('/transaction/<tx_hash>')
+def transaction_details(tx_hash):
+    """Show details for a specific transaction"""
+    wallet_address = session.get('wallet_address')
+    if not wallet_address:
+        flash('Please login first', 'warning')
+        return redirect(url_for('login'))
+    
+    # Try to get transaction details from Etherscan
+    try:
+        tx = get_transaction_details(tx_hash)
+    except Exception as e:
+        logging.error(f"Error fetching transaction details from Etherscan: {str(e)}")
+        tx = None
+    
+    # If not found, try to find in recent transactions
+    if not tx:
+        try:
+            transactions = get_transaction_history(wallet_address)
+            tx = next((t for t in transactions if t['tx_hash'] == tx_hash), None)
+        except Exception:
+            tx = None
+    
+    # If still not found, check mock data
+    if not tx:
+        transactions = get_mock_transactions(wallet_address)
+        tx = next((t for t in transactions if t['tx_hash'] == tx_hash), None)
+    
+    if not tx:
+        flash('Transaction not found', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    # Check if the transaction is flagged
+    flag = FlaggedTransaction.query.filter_by(tx_hash=tx_hash, wallet_address=wallet_address).first()
+    tx_is_flagged = flag is not None
+    flag_reason = flag.reason if flag else None
+    
+    return render_template(
+        'transaction_details.html',
+        wallet_address=wallet_address,
+        tx=tx,
+        tx_is_flagged=tx_is_flagged,
+        flag_reason=flag_reason
+    )
+
+
+@app.route('/search')
+def search():
+    """Search form for Ethereum addresses"""
+    wallet_address = session.get('wallet_address')
+    logged_in = wallet_address is not None
+    
+    return render_template('search.html', logged_in=logged_in)
+
+
+@app.route('/search/results')
+def search_results():
+    """Show analysis results for an Ethereum address"""
+    address = request.args.get('address')
+    
+    if not address:
+        flash('Please enter an Ethereum address', 'warning')
+        return redirect(url_for('search'))
+    
+    # Basic validation
+    if not address.startswith('0x') or len(address) != 42:
+        flash('Invalid Ethereum address format', 'danger')
+        return redirect(url_for('search'))
+    
+    # Get current user's wallet address from session
+    wallet_address = session.get('wallet_address')
+    logged_in = wallet_address is not None
+    is_my_address = logged_in and wallet_address.lower() == address.lower()
+    
+    # Get transactions and balance from Etherscan
+    try:
+        transactions = get_transaction_history(address)
+        balance = get_ether_balance(address)
+        
+        # Use classifier to determine category
+        category = classify_address(transactions)
+        
+    except Exception as e:
+        logging.error(f"Error fetching Etherscan data: {str(e)}")
+        flash('Error fetching blockchain data. Please try again later.', 'danger')
+        return redirect(url_for('search'))
+    
+    return render_template(
+        'search_results.html',
+        address=address,
+        transactions=transactions,
+        category=category,
+        balance=balance,
+        logged_in=logged_in,
+        is_my_address=is_my_address
+    )
+
+
 @app.route('/logout')
 def logout():
     """Log out by removing wallet from session"""

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Details - TrustMark</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fa fa-shield me-2"></i>TrustMark
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('flagged_stats') }}">Flagged Stats</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 class="mb-3">Transaction Details</h1>
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <span class="badge bg-dark p-2">
+                            <i class="fa fa-hashtag me-1"></i> Transaction
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light">
+                        <i class="fa fa-arrow-left me-1"></i> Back to Dashboard
+                    </a>
+                    {% if tx_is_flagged %}
+                        <form action="{{ url_for('flag_transaction') }}" method="post" class="d-inline">
+                            <input type="hidden" name="tx_hash" value="{{ tx.tx_hash }}">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fa fa-flag me-1"></i> Remove Flag
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="dropdown">
+                            <button class="btn btn-outline-warning dropdown-toggle" type="button" id="flagDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-flag-o me-1"></i> Flag Transaction
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="flagDropdown">
+                                <li>
+                                    <form action="{{ url_for('flag_transaction') }}" method="post">
+                                        <input type="hidden" name="tx_hash" value="{{ tx.tx_hash }}">
+                                        <input type="hidden" name="flag_reason" value="suspicious">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fa fa-exclamation-triangle me-1"></i> Mark as Suspicious
+                                        </button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form action="{{ url_for('flag_transaction') }}" method="post">
+                                        <input type="hidden" name="tx_hash" value="{{ tx.tx_hash }}">
+                                        <input type="hidden" name="flag_reason" value="scam">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fa fa-ban me-1"></i> Mark as Scam
+                                        </button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form action="{{ url_for('flag_transaction') }}" method="post">
+                                        <input type="hidden" name="tx_hash" value="{{ tx.tx_hash }}">
+                                        <input type="hidden" name="flag_reason" value="phishing">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fa fa-user-secret me-1"></i> Mark as Phishing
+                                        </button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form action="{{ url_for('flag_transaction') }}" method="post">
+                                        <input type="hidden" name="tx_hash" value="{{ tx.tx_hash }}">
+                                        <input type="hidden" name="flag_reason" value="fraud">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fa fa-warning me-1"></i> Mark as Fraud
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Transaction Hash: {{ tx.tx_hash }}</h5>
+                        <a href="https://etherscan.io/tx/{{ tx.tx_hash }}" target="_blank" class="btn btn-sm btn-outline-info">
+                            <i class="fa fa-external-link me-1"></i> View on Etherscan
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Transaction Details</h6>
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Amount:</strong></td>
+                                            <td>
+                                                {% if tx.direction == 'in' %}
+                                                    <span class="text-success">+{{ tx.amount }} ETH</span>
+                                                {% else %}
+                                                    <span class="text-danger">-{{ tx.amount }} ETH</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Direction:</strong></td>
+                                            <td>
+                                                {% if tx.direction == 'in' %}
+                                                    <span class="badge bg-success">Received</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">Sent</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Type:</strong></td>
+                                            <td>
+                                                {% if tx.note %}
+                                                    <span class="badge bg-info">{{ tx.note }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">Regular Transaction</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Contract Call:</strong></td>
+                                            <td>
+                                                {% if tx.contract_call %}
+                                                    <span class="badge bg-secondary">Yes</span>
+                                                {% else %}
+                                                    <span class="badge bg-dark">No</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% if tx.timestamp %}
+                                        <tr>
+                                            <td><strong>Timestamp:</strong></td>
+                                            <td>{{ tx.timestamp|datetime }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if tx.block_number %}
+                                        <tr>
+                                            <td><strong>Block:</strong></td>
+                                            <td>{{ tx.block_number }}</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Addresses</h6>
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>From:</strong></td>
+                                            <td>
+                                                <code class="text-break">{{ tx.from }}</code>
+                                                {% if tx.from == wallet_address %}
+                                                    <span class="badge bg-info ms-2">You</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>To:</strong></td>
+                                            <td>
+                                                <code class="text-break">{{ tx.to }}</code>
+                                                {% if tx.to == wallet_address %}
+                                                    <span class="badge bg-info ms-2">You</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% if tx.gas %}
+                                        <tr>
+                                            <td><strong>Gas:</strong></td>
+                                            <td>{{ tx.gas }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if tx.gas_price %}
+                                        <tr>
+                                            <td><strong>Gas Price:</strong></td>
+                                            <td>{{ tx.gas_price / 1000000000 }} Gwei</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        {% if tx_is_flagged %}
+                            <div class="alert alert-warning">
+                                <i class="fa fa-flag me-2"></i>
+                                This transaction has been <strong>flagged as {{ flag_reason|capitalize }}</strong> in your account.
+                            </div>
+                        {% endif %}
+                        
+                        {% if tx.data and tx.data != '0x' %}
+                            <div class="mt-4">
+                                <h6 class="text-muted">Transaction Data</h6>
+                                <div class="bg-dark p-3 rounded">
+                                    <code class="text-break text-light">{{ tx.data }}</code>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-4 bg-dark text-white-50 mt-5">
+        <div class="container text-center">
+            <small>&copy; 2023 TrustMark Protocol | <a href="#" class="text-white">Terms</a> | <a href="#" class="text-white">Privacy</a></small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

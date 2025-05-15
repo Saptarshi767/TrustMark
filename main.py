@@ -1,8 +1,11 @@
 import os
 import logging
+from datetime import datetime
+from collections import Counter, defaultdict
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify, flash
 from utils.blockchain import get_user_transactions
 from utils.classifier import classify_address
+from models import db, FlaggedTransaction
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -11,8 +14,31 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trustmark-dev-secret")
 
-# Store flagged transactions in memory with reasons
-flagged_transactions = {}
+# Configure the database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+
+# Initialize the database
+db.init_app(app)
+
+# Add custom filters
+@app.template_filter('datetime')
+def format_datetime(value):
+    """Format a datetime to a readable string"""
+    if isinstance(value, str):
+        try:
+            value = datetime.fromisoformat(value.replace('Z', '+00:00'))
+        except ValueError:
+            return value
+    return value.strftime('%b %d, %Y %H:%M') if value else ''
+
+# Create all tables
+with app.app_context():
+    db.create_all()
 
 @app.route('/')
 def index():
@@ -48,11 +74,15 @@ def dashboard():
     # Classify the address based on transactions
     category = classify_address(transactions)
     
-    # Check which transactions are flagged and add reason if flagged
+    # Get flagged transactions from the database
+    flagged_txs = FlaggedTransaction.query.filter_by(wallet_address=wallet_address).all()
+    flagged_tx_dict = {tx.tx_hash: tx.reason for tx in flagged_txs}
+    
+    # Check which transactions are flagged and add reason
     for tx in transactions:
-        if tx['tx_hash'] in flagged_transactions:
+        if tx['tx_hash'] in flagged_tx_dict:
             tx['flagged'] = True
-            tx['flag_reason'] = flagged_transactions[tx['tx_hash']]
+            tx['flag_reason'] = flagged_tx_dict[tx['tx_hash']]
         else:
             tx['flagged'] = False
             tx['flag_reason'] = None
@@ -72,23 +102,106 @@ def classify():
     category = classify_address(data['transactions'])
     return jsonify({'category': category})
 
+
+@app.route('/api/flagged_transactions')
+def get_flagged_transactions():
+    """API endpoint to get all flagged transactions for the current wallet"""
+    wallet_address = session.get('wallet_address')
+    if not wallet_address:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    # Get all flagged transactions for this wallet
+    flagged_txs = FlaggedTransaction.query.filter_by(wallet_address=wallet_address).all()
+    
+    # Convert to dictionary format
+    flagged_list = [tx.to_dict() for tx in flagged_txs]
+    
+    return jsonify({
+        'wallet_address': wallet_address,
+        'flagged_transactions': flagged_list
+    })
+
+
+@app.route('/flagged_stats')
+def flagged_stats():
+    """Page showing statistics for flagged transactions"""
+    wallet_address = session.get('wallet_address')
+    if not wallet_address:
+        flash('Please login first', 'warning')
+        return redirect(url_for('login'))
+    
+    # Get all flagged transactions for this wallet
+    flagged_txs = FlaggedTransaction.query.filter_by(wallet_address=wallet_address).all()
+    
+    # Calculate statistics for the charts
+    
+    # Flag reasons distribution
+    reasons = [tx.reason for tx in flagged_txs]
+    reason_counter = Counter(reasons)
+    flag_reasons = list(reason_counter.keys())
+    flag_counts = list(reason_counter.values())
+    
+    # Timeline of flagging activity
+    # Group by date
+    timeline = defaultdict(int)
+    for tx in flagged_txs:
+        date_str = tx.created_at.strftime('%Y-%m-%d')
+        timeline[date_str] += 1
+    
+    # Sort by date
+    timeline_dates = sorted(timeline.keys())
+    timeline_counts = [timeline[date] for date in timeline_dates]
+    
+    # Format dates for display
+    timeline_dates = [datetime.strptime(date, '%Y-%m-%d').strftime('%b %d') for date in timeline_dates]
+    
+    return render_template('flagged_stats.html',
+                          wallet_address=wallet_address,
+                          flagged_transactions=flagged_txs,
+                          flag_reasons=flag_reasons,
+                          flag_counts=flag_counts,
+                          timeline_dates=timeline_dates,
+                          timeline_counts=timeline_counts)
+
 @app.route('/flag_tx', methods=['POST'])
 def flag_transaction():
     """API endpoint to flag a transaction"""
     tx_hash = request.form.get('tx_hash')
     flag_reason = request.form.get('flag_reason', 'suspicious')
+    wallet_address = session.get('wallet_address')
     
     if not tx_hash:
         return jsonify({'success': False, 'message': 'No transaction hash provided'}), 400
     
-    # Store or remove flag with reason
-    # We're using a dictionary of tx_hash -> reason instead of a simple set
-    if tx_hash in flagged_transactions:
-        del flagged_transactions[tx_hash]
+    if not wallet_address:
+        return jsonify({'success': False, 'message': 'Not logged in'}), 401
+    
+    # Check if already flagged
+    existing_flag = FlaggedTransaction.query.filter_by(tx_hash=tx_hash, wallet_address=wallet_address).first()
+    
+    if existing_flag:
+        # Remove flag from database
+        db.session.delete(existing_flag)
+        db.session.commit()
         flagged = False
         reason = None
     else:
-        flagged_transactions[tx_hash] = flag_reason
+        # Get transaction details for additional context
+        transactions = get_user_transactions(wallet_address)
+        tx_details = next((tx for tx in transactions if tx['tx_hash'] == tx_hash), None)
+        
+        # Create new flag
+        new_flag = FlaggedTransaction(
+            tx_hash=tx_hash,
+            wallet_address=wallet_address,
+            reason=flag_reason,
+            amount=tx_details.get('amount') if tx_details else None,
+            direction=tx_details.get('direction') if tx_details else None,
+            note=tx_details.get('note') if tx_details else None
+        )
+        
+        db.session.add(new_flag)
+        db.session.commit()
         flagged = True
         reason = flag_reason
     

@@ -379,6 +379,19 @@
                 });
             }
             
+            // Function to extract flag reason from button inner HTML
+            function extractFlagReason(html) {
+                // Check if html contains 'Flagged: '
+                if (html && html.includes('Flagged: ')) {
+                    // Extract the reason text that follows "Flagged: "
+                    const matches = html.match(/Flagged: (\w+)/);
+                    if (matches && matches.length > 1) {
+                        return matches[1];
+                    }
+                }
+                return 'Suspicious'; // Default reason
+            }
+            
             // Initialize by attaching unflag listeners
             attachUnflagListeners();
             
@@ -408,7 +421,7 @@
                                 </div>
                                 <div>
                                     <span class="badge bg-warning">Flagged</span>
-                                    <span class="badge bg-secondary">{{ getFlagReasonText(btn) }}</span>
+                                    <span class="badge bg-secondary">${extractFlagReason(btn.innerHTML)}</span>
                                 </div>
                             </div>
                         </li>

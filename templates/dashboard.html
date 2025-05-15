@@ -26,6 +26,9 @@
                         <a class="nav-link active" href="{{ url_for('dashboard') }}">Dashboard</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('flagged_stats') }}">Flagged Stats</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                     </li>
                 </ul>
@@ -57,9 +60,18 @@
                         </span>
                     </div>
                 </div>
+                <div class="mt-2">
+                    <div class="alert alert-info">
+                        <i class="fa fa-database me-1"></i> Flagged transactions are now stored in a database! 
+                        <a href="{{ url_for('flagged_stats') }}" class="alert-link">View Statistics <i class="fa fa-arrow-right"></i></a>
+                    </div>
+                </div>
             </div>
             <div class="col-md-4 text-md-end">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('flagged_stats') }}" class="btn btn-info">
+                        <i class="fa fa-chart-bar me-1"></i> Flag Stats
+                    </a>
                     <button class="btn btn-outline-light" onclick="window.print()">
                         <i class="fa fa-print me-1"></i> Print
                     </button>

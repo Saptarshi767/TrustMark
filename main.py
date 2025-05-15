@@ -141,12 +141,26 @@ def flagged_stats():
     flag_reasons = list(reason_counter.keys())
     flag_counts = list(reason_counter.values())
     
+    # Set default values if no flagged transactions exist
+    if not flag_reasons:
+        flag_reasons = ['No Data']
+        flag_counts = [0]
+    
     # Timeline of flagging activity
     # Group by date
     timeline = defaultdict(int)
+    
+    # Add today as default if no data
+    today = datetime.now().strftime('%Y-%m-%d')
+    
     for tx in flagged_txs:
-        date_str = tx.created_at.strftime('%Y-%m-%d')
-        timeline[date_str] += 1
+        if tx.created_at:
+            date_str = tx.created_at.strftime('%Y-%m-%d')
+            timeline[date_str] += 1
+    
+    # Ensure at least the current date exists
+    if not timeline:
+        timeline[today] = 0
     
     # Sort by date
     timeline_dates = sorted(timeline.keys())
@@ -191,14 +205,15 @@ def flag_transaction():
         tx_details = next((tx for tx in transactions if tx['tx_hash'] == tx_hash), None)
         
         # Create new flag
-        new_flag = FlaggedTransaction(
-            tx_hash=tx_hash,
-            wallet_address=wallet_address,
-            reason=flag_reason,
-            amount=tx_details.get('amount') if tx_details else None,
-            direction=tx_details.get('direction') if tx_details else None,
-            note=tx_details.get('note') if tx_details else None
-        )
+        new_flag = FlaggedTransaction()
+        new_flag.tx_hash = tx_hash
+        new_flag.wallet_address = wallet_address
+        new_flag.reason = flag_reason
+        
+        if tx_details:
+            new_flag.amount = tx_details.get('amount')
+            new_flag.direction = tx_details.get('direction')
+            new_flag.note = tx_details.get('note')
         
         db.session.add(new_flag)
         db.session.commit()

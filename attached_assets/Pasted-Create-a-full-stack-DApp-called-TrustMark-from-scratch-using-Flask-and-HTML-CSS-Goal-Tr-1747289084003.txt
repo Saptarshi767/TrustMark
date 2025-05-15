@@ -1,0 +1,100 @@
+Create a full-stack DApp called **TrustMark** from scratch using Flask and HTML/CSS.
+
+🎯 Goal:
+TrustMark is a decentralized reputation tagging platform that:
+- Analyzes Ethereum wallet transactions
+- Classifies addresses into categories like:
+  - Rookie
+  - Whale Trader
+  - Bot
+  - Hacker
+  - Whitehat
+  - Airdrop Hunter
+  - Liquidity Provider
+- Allows users to view their past transactions and manually flag individual transactions
+
+---
+
+📁 Required Folder & File Structure:
+
+- `main.py`: Flask app logic
+- `.replit`: Run config → `python3 main.py`
+- `replit.nix`: Flask, Web3, and dependencies
+- `utils/blockchain.py`: Returns mock transaction history for a wallet
+- `utils/classifier.py`: Contains address tagging logic
+- `templates/`
+  - `index.html`: Landing Page
+  - `login.html`: Input wallet to simulate login
+  - `dashboard.html`: View transactions + Flag each one
+
+---
+
+🧑‍💻 Features to Implement:
+
+### 🏠 `/` — Landing Page
+- Welcome to TrustMark
+- Brief about the protocol
+- Buttons:
+  - “Login” → `/login`
+  - “View Dashboard”
+  - “Download Extension” (just link for now)
+
+---
+
+### 🔐 `/login` — Wallet Login
+- Simulate MetaMask: Input field for Ethereum wallet address
+- Save address to session or a global variable
+
+---
+
+### 📊 `/dashboard` — User Dashboard
+- Show the logged-in user's Ethereum address
+- Fetch their transactions using `get_user_transactions(address)`
+- Display each transaction in a table:
+  - tx_hash
+  - amount
+  - direction (in/out)
+  - type/note
+  - Category from `classify_address(tx_list)`
+  - ⚠️ Button to **flag this transaction**
+
+### 🚩 Flagging System
+- Each transaction row should have a “Flag” button
+- Clicking it sends a POST request to `/flag_tx`
+- Store flagged status and show a ✅ next to flagged rows
+
+---
+
+🧠 Classification Logic (`classifier.py`):
+- tx_count < 5 → "Rookie"
+- >10 contract calls → "Bot"
+- volume > 100,000 → "Whale Trader"
+- note = “airdrop” → "Airdrop Hunter"
+- note = “exploit” → "Hacker"
+- note = “audit” → "Whitehat"
+
+---
+
+🧩 Chrome Extension (stub):
+- manifest.json
+- popup.html
+- JS: scan page for ETH addresses and show warning if flagged
+
+---
+
+🧪 Flask Routes:
+- `/` → index
+- `/login` → enter address
+- `/dashboard` → show transactions, allow flagging
+- `/classify` → POST: return category from transaction list
+- `/flag_tx` → POST: mark a transaction ID as flagged
+
+---
+
+📌 Requirements:
+- Use mock transaction data in `blockchain.py`
+- Flagging doesn’t need DB, just store in memory for now
+- Dashboard should show category beside each transaction
+- UI must be clean and functional
+
+Start building now from scratch. Generate all Python, HTML, and JS files required.

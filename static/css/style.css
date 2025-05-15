@@ -1,0 +1,77 @@
+/* Custom styles for TrustMark */
+
+/* Ethereum address styling */
+.eth-address {
+    font-family: monospace;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Transaction table improvements */
+.table-hover tbody tr:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.075);
+}
+
+/* Badge styles for transaction categories */
+.badge.category-rookie {
+    background-color: var(--bs-secondary);
+}
+
+.badge.category-bot {
+    background-color: var(--bs-info);
+}
+
+.badge.category-whale {
+    background-color: var(--bs-primary);
+}
+
+.badge.category-hacker {
+    background-color: var(--bs-danger);
+}
+
+.badge.category-whitehat {
+    background-color: var(--bs-success);
+}
+
+.badge.category-airdrop {
+    background-color: var(--bs-purple);
+}
+
+.badge.category-liquidity {
+    background-color: var(--bs-teal);
+}
+
+/* Flag button hover effect */
+.flag-btn:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* Print styles */
+@media print {
+    .navbar, .btn, footer, .card-footer {
+        display: none !important;
+    }
+    
+    body {
+        background-color: white !important;
+        color: black !important;
+    }
+    
+    .card {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+    
+    .card-header {
+        background-color: #f8f9fa !important;
+        color: black !important;
+    }
+    
+    .table {
+        color: black !important;
+    }
+}

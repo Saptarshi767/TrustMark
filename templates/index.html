@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustMark - Decentralized Reputation Platform</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fa fa-shield me-2"></i>TrustMark
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="py-5 bg-dark text-white text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">TrustMark</h1>
+            <p class="lead mb-4">A decentralized reputation tagging platform for Ethereum</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Login with Wallet</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg">View Dashboard</a>
+                <a href="{{ url_for('static', filename='chrome_extension.zip') }}" class="btn btn-secondary btn-lg">
+                    <i class="fa fa-download me-2"></i>Download Extension
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="text-center mb-5">
+                        <h2>About TrustMark Protocol</h2>
+                        <p class="lead text-muted">Enhancing trust in the Ethereum ecosystem through transaction analysis</p>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        <i class="fa fa-search fa-3x text-primary"></i>
+                                    </div>
+                                    <h3 class="card-title h5">Transaction Analysis</h3>
+                                    <p class="card-text">We analyze Ethereum wallet transactions to identify patterns and behaviors.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        <i class="fa fa-tags fa-3x text-primary"></i>
+                                    </div>
+                                    <h3 class="card-title h5">Address Classification</h3>
+                                    <p class="card-text">Classify addresses into categories like Rookie, Whale Trader, Bot, and more.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        <i class="fa fa-flag fa-3x text-primary"></i>
+                                    </div>
+                                    <h3 class="card-title h5">Flag Suspicious Activity</h3>
+                                    <p class="card-text">Mark suspicious transactions and help protect the community.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-dark text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2>Identify Wallet Categories</h2>
+                    <p class="lead">Our advanced classification system can identify:</p>
+                    <ul class="list-group list-group-flush bg-transparent mb-4">
+                        <li class="list-group-item bg-transparent text-white border-secondary">
+                            <i class="fa fa-user-o me-2"></i> Rookie
+                        </li>
+                        <li class="list-group-item bg-transparent text-white border-secondary">
+                            <i class="fa fa-money me-2"></i> Whale Trader
+                        </li>
+                        <li class="list-group-item bg-transparent text-white border-secondary">
+                            <i class="fa fa-android me-2"></i> Bot
+                        </li>
+                        <li class="list-group-item bg-transparent text-white border-secondary">
+                            <i class="fa fa-warning me-2"></i> Hacker
+                        </li>
+                        <li class="list-group-item bg-transparent text-white border-secondary">
+                            <i class="fa fa-shield me-2"></i> Whitehat
+                        </li>
+                        <li class="list-group-item bg-transparent text-white border-secondary">
+                            <i class="fa fa-parachute-box me-2"></i> Airdrop Hunter
+                        </li>
+                        <li class="list-group-item bg-transparent text-white border-secondary">
+                            <i class="fa fa-exchange me-2"></i> Liquidity Provider
+                        </li>
+                    </ul>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light">Try It Now</a>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-secondary">
+                        <div class="card-body p-4">
+                            <h4>Chrome Extension</h4>
+                            <p>Protect yourself while browsing Web3 sites with our Chrome extension.</p>
+                            <ul>
+                                <li>Scan pages for Ethereum addresses</li>
+                                <li>Display reputation tags on hover</li>
+                                <li>Flag suspicious addresses</li>
+                            </ul>
+                            <a href="{{ url_for('static', filename='chrome_extension.zip') }}" class="btn btn-primary">
+                                <i class="fa fa-download me-2"></i>Download Extension
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-4 bg-dark text-white-50">
+        <div class="container text-center">
+            <small>&copy; 2023 TrustMark Protocol | <a href="#" class="text-white">Terms</a> | <a href="#" class="text-white">Privacy</a></small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

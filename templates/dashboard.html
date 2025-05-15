@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - TrustMark</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fa fa-shield me-2"></i>TrustMark
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 class="mb-3">User Dashboard</h1>
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <span class="badge bg-dark p-2">
+                            <i class="fa fa-wallet me-1"></i> {{ wallet_address }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="badge bg-primary p-2">
+                            <i class="fa fa-tag me-1"></i> {{ category }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button class="btn btn-outline-light" onclick="window.print()">
+                        <i class="fa fa-print me-1"></i> Print
+                    </button>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                        <i class="fa fa-sign-out me-1"></i> Disconnect
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark">
+                <h5 class="mb-0">Transaction History</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Transaction Hash</th>
+                                <th>Amount (ETH)</th>
+                                <th>Direction</th>
+                                <th>Type/Note</th>
+                                <th>Contract Call</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if transactions %}
+                                {% for tx in transactions %}
+                                    <tr id="tx-{{ tx.tx_hash }}">
+                                        <td class="text-truncate" style="max-width: 150px;">{{ tx.tx_hash }}</td>
+                                        <td>
+                                            {% if tx.direction == 'in' %}
+                                                <span class="text-success">+{{ tx.amount }}</span>
+                                            {% else %}
+                                                <span class="text-danger">-{{ tx.amount }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if tx.direction == 'in' %}
+                                                <span class="badge bg-success">Received</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Sent</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if tx.note %}
+                                                <span class="badge bg-info">{{ tx.note }}</span>
+                                            {% else %}
+                                                <span class="text-muted">Regular Transaction</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if tx.contract_call %}
+                                                <span class="badge bg-secondary">Yes</span>
+                                            {% else %}
+                                                <span class="badge bg-dark">No</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-warning flag-btn" 
+                                                    data-tx-hash="{{ tx.tx_hash }}"
+                                                    data-flagged="{{ tx.flagged|lower }}">
+                                                {% if tx.flagged %}
+                                                    <i class="fa fa-flag text-warning"></i> Flagged
+                                                {% else %}
+                                                    <i class="fa fa-flag-o"></i> Flag
+                                                {% endif %}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center p-4">
+                                        <div class="alert alert-info mb-0">
+                                            No transactions found for this address.
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-dark">
+                        <h5 class="mb-0">Categorization Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6>Classification: <span class="badge bg-primary">{{ category }}</span></h6>
+                        </div>
+                        
+                        <h6>Classification Criteria:</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-transparent">
+                                <strong>Rookie:</strong> Less than 5 transactions
+                            </li>
+                            <li class="list-group-item bg-transparent">
+                                <strong>Bot:</strong> More than 10 contract calls
+                            </li>
+                            <li class="list-group-item bg-transparent">
+                                <strong>Whale Trader:</strong> Transaction volume > 100,000 ETH
+                            </li>
+                            <li class="list-group-item bg-transparent">
+                                <strong>Airdrop Hunter:</strong> Has airdrop transactions
+                            </li>
+                            <li class="list-group-item bg-transparent">
+                                <strong>Hacker:</strong> Has exploit transactions
+                            </li>
+                            <li class="list-group-item bg-transparent">
+                                <strong>Whitehat:</strong> Has audit transactions
+                            </li>
+                            <li class="list-group-item bg-transparent">
+                                <strong>Liquidity Provider:</strong> Multiple high-volume transactions
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-dark">
+                        <h5 class="mb-0">Flagged Transactions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="flagged-transactions">
+                            <!-- This will be populated with JavaScript -->
+                            <div class="alert alert-secondary">
+                                No transactions have been flagged yet.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            <i class="fa fa-info-circle me-1"></i>
+                            Flagged transactions help improve our classification system.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-4 bg-dark text-white-50 mt-5">
+        <div class="container text-center">
+            <small>&copy; 2023 TrustMark Protocol | <a href="#" class="text-white">Terms</a> | <a href="#" class="text-white">Privacy</a></small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Flag button click handler
+            const flagButtons = document.querySelectorAll('.flag-btn');
+            flagButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const txHash = this.getAttribute('data-tx-hash');
+                    const isFlagged = this.getAttribute('data-flagged') === 'true';
+                    
+                    // Send flag request
+                    const formData = new FormData();
+                    formData.append('tx_hash', txHash);
+                    
+                    fetch('/flag_tx', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update button UI
+                            if (data.flagged) {
+                                this.innerHTML = '<i class="fa fa-flag text-warning"></i> Flagged';
+                                this.setAttribute('data-flagged', 'true');
+                            } else {
+                                this.innerHTML = '<i class="fa fa-flag-o"></i> Flag';
+                                this.setAttribute('data-flagged', 'false');
+                            }
+                            
+                            // Update flagged transactions section
+                            updateFlaggedTransactionsView();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to update flag status');
+                    });
+                });
+            });
+            
+            // Update flagged transactions view
+            function updateFlaggedTransactionsView() {
+                const flaggedTxs = document.querySelectorAll('.flag-btn[data-flagged="true"]');
+                const flaggedContainer = document.getElementById('flagged-transactions');
+                
+                if (flaggedTxs.length === 0) {
+                    flaggedContainer.innerHTML = '<div class="alert alert-secondary">No transactions have been flagged yet.</div>';
+                    return;
+                }
+                
+                let html = '<ul class="list-group">';
+                flaggedTxs.forEach(btn => {
+                    const txHash = btn.getAttribute('data-tx-hash');
+                    const row = document.getElementById(`tx-${txHash}`);
+                    const amount = row.cells[1].textContent.trim();
+                    const direction = row.cells[2].textContent.trim();
+                    
+                    html += `
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-truncate" style="max-width: 150px;">${txHash}</div>
+                                    <small>${direction} ${amount}</small>
+                                </div>
+                                <span class="badge bg-warning">Flagged</span>
+                            </div>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+                
+                flaggedContainer.innerHTML = html;
+            }
+            
+            // Initial update of flagged transactions
+            updateFlaggedTransactionsView();
+        });
+    </script>
+</body>
+</html>

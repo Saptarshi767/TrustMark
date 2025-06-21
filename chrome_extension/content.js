@@ -4,8 +4,8 @@
 // Fetches flagged addresses from local TrustMark backend
 
 (function() {
-    // Regex for Ethereum addresses
-    const ethAddressRegex = /0x[a-fA-F0-9]{40}/g;
+    // Regex for Ethereum addresses (ensures it's not part of a longer hex string)
+    const ethAddressRegex = /b(0x[a-fA-F0-9]{40})b/g;
     
     // TrustMark Backend URL - Deployed on Vercel
     const BACKEND_URL = 'https://trust-mark.vercel.app';
@@ -178,16 +178,41 @@
     // Refresh flagged addresses every 5 minutes
     setInterval(fetchFlaggedAddresses, 5 * 60 * 1000);
 
-    // Listen for messages from the popup
-    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        if (request.action === "scanPage") {
-            const bodyText = document.body.innerText;
-            const addresses = bodyText.match(ethAddressRegex) || [];
-            // Remove duplicates
-            const uniqueAddresses = [...new Set(addresses)];
-            sendResponse({ addresses: uniqueAddresses });
+    /**
+     * Finds all unique Ethereum addresses on the page.
+     * This function is designed to be efficient by using TreeWalker.
+     */
+    function findAddresses() {
+        const addresses = new Set();
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+        let node;
+        while (node = walker.nextNode()) {
+            // Skip script and style content
+            const parentTag = node.parentElement.tagName;
+            if (parentTag === 'SCRIPT' || parentTag === 'STYLE') {
+                continue;
+            }
+            
+            const matches = node.nodeValue.match(ethAddressRegex);
+            if (matches) {
+                matches.forEach(addr => addresses.add(addr));
+            }
         }
-        // Keep the message channel open for async response
+        return Array.from(addresses);
+    }
+
+    // Listen for a message from the popup script
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request.action === "scanPage") {
+            try {
+                const uniqueAddresses = findAddresses();
+                sendResponse({ addresses: uniqueAddresses });
+            } catch (error) {
+                console.error("TrustMark: Error scanning page:", error);
+                sendResponse({ addresses: [], error: "Failed to scan the page." });
+            }
+        }
+        // Return true to indicate you wish to send a response asynchronously
         return true;
     });
 })(); 

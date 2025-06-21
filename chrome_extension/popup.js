@@ -45,16 +45,12 @@ async function fetchFlaggedAddresses() {
 
 // Function to scan the current page for Ethereum addresses
 function scanPageForAddresses() {
-  // Get the current active tab
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    // Send a message to the content script to scan the page
-    chrome.tabs.sendMessage(tabs[0].id, {action: "scanPage"}, function(response) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "scanPage" }, function(response) {
       if (chrome.runtime.lastError) {
-        // Handle error - content script might not be injected yet
-        displayError("Could not scan page. Refresh and try again.");
+        displayError("Could not scan page. Please refresh the page and try again.");
         return;
       }
-      
       if (response && response.addresses) {
         displayAddresses(response.addresses);
       } else {

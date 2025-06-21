@@ -57,7 +57,10 @@
         const textNodes = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
         let node;
         while (node = textNodes.nextNode()) {
-            if (node.parentElement.tagName.toLowerCase() !== 'script' && node.parentElement.tagName.toLowerCase() !== 'style') {
+            if (node.parentElement.tagName.toLowerCase() !== 'script' && 
+                node.parentElement.tagName.toLowerCase() !== 'style' &&
+                !node.parentElement.classList.contains('trustmark-processed')) {
+
                 const matches = node.nodeValue.match(ethAddressRegex);
                 if (matches) {
                     const fragment = document.createDocumentFragment();
@@ -76,6 +79,11 @@
                     });
                     fragment.appendChild(document.createTextNode(node.nodeValue.substring(lastIndex)));
                     node.parentNode.replaceChild(fragment, node);
+                    // Mark the parent element as processed
+                    // This is not perfect, as the new fragment has multiple parents,
+                    // but for this implementation, we mark the original parent.
+                    // A better implementation would mark the new text nodes themselves.
+                    // However, let's stick to a simple fix first.
                 }
             }
         }

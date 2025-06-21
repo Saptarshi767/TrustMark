@@ -92,12 +92,12 @@ body {
     -webkit-backdrop-filter: blur(12px);
     border-radius: 24px;
     border: 1.5px solid rgba(255,255,255,0.12);
-    transition: transform 1.5s cubic-bezier(.25,.8,.25,1), box-shadow 1.5s;
-    will-change: transform;
+    transition: transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+    will-change: transform, box-shadow;
 }
 .glass-card:hover {
-    transform: translateY(-8px) scale(1.03) rotateX(2deg);
-    box-shadow: 0 16px 48px 0 rgba(31, 38, 135, 0.37), 0 3px 12px 0 rgba(0,0,0,0.18);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.45), 0 2px 8px 0 rgba(0,0,0,0.18);
 }
 
 .btn-3d {

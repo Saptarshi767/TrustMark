@@ -1,0 +1,8 @@
+# Copy these environment variables to Vercel Dashboard
+# Go to your project → Settings → Environment Variables
+
+ETHERSCAN_API_KEY=IRI57XAY533YXUSDTU9J9TU6ZY9B4IWSRS
+
+SESSION_SECRET=f17c8a1090927d5d60fd03b0fa11cb1b6cd9f4943ed5ddde6addeb08de2847f1
+
+POSTGRES_URL=postgresql://neondb_owner:npg_eKM8SwmtgyJ7@ep-long-dream-a82i5ypq-pooler.eastus2.azure.neon.tech/neondb?sslmode=require 

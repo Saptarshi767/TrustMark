@@ -8,6 +8,7 @@
     const ethAddressRegex = /0x[a-fA-F0-9]{40}/g;
     
     // IMPORTANT: Replace this with your deployed Vercel URL
+    // Example: https://trustmark-app.vercel.app
     const BACKEND_URL = 'https://YOUR_VERCEL_PROJECT_URL.vercel.app';
     
     // Store flagged addresses

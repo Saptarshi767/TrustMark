@@ -10,6 +10,9 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.svg') }}">
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
@@ -25,8 +28,9 @@
 </head>
 <body>
     <div class="toggle-switch">
-        <button id="toggleMode" class="btn btn-3d" title="Toggle dark/light mode">
+        <button id="toggleMode" class="btn btn-3d" title="Toggle dark/light mode" aria-label="Toggle dark/light mode">
             <i class="fa fa-moon"></i>
+            <span class="visually-hidden">Toggle Theme</span>
         </button>
     </div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark animated-border" data-aos="fade-down">
@@ -34,7 +38,7 @@
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fa fa-shield me-2"></i>TrustMark
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -55,36 +59,48 @@
 
     <header class="hero-3d text-white text-center mb-5" data-aos="zoom-in">
         <div class="container">
-            <h1 class="display-3 fw-bold mb-3" style="letter-spacing: 2px;">TrustMark</h1>
-            <p class="lead mb-4 fs-4">A decentralized reputation tagging platform for Ethereum</p>
-            <div class="d-flex justify-content-center gap-3 mb-4">
-                <a href="{{ url_for('login') }}" class="btn btn-3d btn-lg">Login with Wallet</a>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg" title="View your dashboard">View Dashboard</a>
+            <h1 class="display-3 fw-bold mb-3" style="letter-spacing: 2px; text-shadow: 0 4px 8px rgba(0,0,0,0.3);">TrustMark</h1>
+            <p class="lead mb-4 fs-4" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">A decentralized reputation tagging platform for Ethereum</p>
+            <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
+                <a href="{{ url_for('login') }}" class="btn btn-3d btn-lg">
+                    <i class="fa fa-wallet me-2"></i>Login with Wallet
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg" title="View your dashboard">
+                    <i class="fa fa-dashboard me-2"></i>View Dashboard
+                </a>
                 <a href="{{ url_for('static', filename='chrome_extension.zip') }}" class="btn btn-secondary btn-lg" title="Download the Chrome extension">
                     <i class="fa fa-download me-2"></i>Download Extension
                 </a>
             </div>
-            <div class="row justify-content-center mt-4">
+            <div class="row justify-content-center mt-5">
                 <div class="col-md-4">
                     <div class="glass-card p-4 mb-3" data-aos="fade-up" data-aos-delay="100">
-                        <h2 class="display-6 fw-bold mb-1"><span id="counter-users">0</span>+</h2>
-                        <div class="text-muted">Wallets Analyzed</div>
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <i class="fa fa-users fa-2x text-primary me-3"></i>
+                            <h2 class="display-6 fw-bold mb-0"><span id="counter-users">0</span>+</h2>
+                        </div>
+                        <div class="text-muted fw-medium">Wallets Analyzed</div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="glass-card p-4 mb-3" data-aos="fade-up" data-aos-delay="200">
-                        <h2 class="display-6 fw-bold mb-1"><span id="counter-tx">0</span>+</h2>
-                        <div class="text-muted">Transactions Processed</div>
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <i class="fa fa-exchange fa-2x text-info me-3"></i>
+                            <h2 class="display-6 fw-bold mb-0"><span id="counter-tx">0</span>+</h2>
+                        </div>
+                        <div class="text-muted fw-medium">Transactions Processed</div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="glass-card p-4 mb-3" data-aos="fade-up" data-aos-delay="300">
-                        <h2 class="display-6 fw-bold mb-1"><span id="counter-flags">0</span>+</h2>
-                        <div class="text-muted">Flags Raised</div>
+                        <div class="d-flex align-items-center justify-content-center mb-2">
+                            <i class="fa fa-flag fa-2x text-warning me-3"></i>
+                            <h2 class="display-6 fw-bold mb-0"><span id="counter-flags">0</span>+</h2>
+                        </div>
+                        <div class="text-muted fw-medium">Flags Raised</div>
                     </div>
                 </div>
             </div>
-            <!-- Custom Animated SVG 3D-like Background -->
             <div class="hero-svg-bg position-absolute w-100 h-100" style="top:0;left:0;z-index:0;overflow:hidden;pointer-events:none;">
                 <svg width="100%" height="340" viewBox="0 0 1440 340" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;">
                     <defs>
@@ -96,13 +112,19 @@
                             <stop offset="0%" stop-color="#232946" stop-opacity="0.18"/>
                             <stop offset="100%" stop-color="#5f72ff" stop-opacity="0.12"/>
                         </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge> 
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
                     </defs>
-                    <ellipse id="hero-ell1" cx="900" cy="120" rx="420" ry="110" fill="url(#heroGrad1)"/>
-                    <ellipse id="hero-ell2" cx="400" cy="220" rx="320" ry="80" fill="url(#heroGrad2)"/>
+                    <ellipse id="hero-ell1" cx="900" cy="120" rx="420" ry="110" fill="url(#heroGrad1)" filter="url(#glow)"/>
+                    <ellipse id="hero-ell2" cx="400" cy="220" rx="320" ry="80" fill="url(#heroGrad2)" filter="url(#glow)"/>
                 </svg>
             </div>
             <script>
-            // Parallax effect for SVG ellipses
             document.addEventListener('mousemove', function(e) {
                 const x = e.clientX / window.innerWidth;
                 const y = e.clientY / window.innerHeight;
@@ -115,7 +137,6 @@
                     ell2.setAttribute('cy', 220 + 15 * (0.5 - y));
                 }
             });
-            // Floating animation for hero content
             document.addEventListener('DOMContentLoaded', function() {
                 const hero = document.querySelector('.hero-3d');
                 if (hero) {
@@ -138,35 +159,35 @@
             <div class="row justify-content-center">
                 <div class="col-md-10">
                     <div class="text-center mb-5">
-                        <h2 data-aos="fade-up">About TrustMark Protocol</h2>
-                        <p class="lead text-muted" data-aos="fade-up" data-aos-delay="100">Enhancing trust in the Ethereum ecosystem through transaction analysis</p>
+                        <h2 class="fw-bold" data-aos="fade-up">About TrustMark Protocol</h2>
+                        <p class="lead text-muted" data-aos="fade-up" data-aos-delay="100">Enhancing trust in the Ethereum ecosystem through advanced transaction analysis</p>
                     </div>
                     <div class="row g-4">
                         <div class="col-md-4">
                             <div class="glass-card h-100 p-4 text-center" data-aos="fade-right">
-                                    <div class="mb-3">
-                                        <i class="fa fa-search fa-3x text-primary"></i>
-                                    </div>
-                                    <h3 class="card-title h5">Transaction Analysis</h3>
-                                    <p class="card-text">We analyze Ethereum wallet transactions to identify patterns and behaviors.</p>
+                                <div class="mb-3">
+                                    <i class="fa fa-search fa-3x text-primary"></i>
+                                </div>
+                                <h3 class="card-title h5 fw-bold">Transaction Analysis</h3>
+                                <p class="card-text">Advanced analysis of Ethereum wallet transactions to identify patterns and behaviors using machine learning.</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="glass-card h-100 p-4 text-center" data-aos="zoom-in">
-                                    <div class="mb-3">
-                                        <i class="fa fa-tags fa-3x text-primary"></i>
-                                    </div>
-                                    <h3 class="card-title h5">Address Classification</h3>
-                                    <p class="card-text">Classify addresses into categories like Rookie, Whale Trader, Bot, and more.</p>
+                                <div class="mb-3">
+                                    <i class="fa fa-tags fa-3x text-primary"></i>
+                                </div>
+                                <h3 class="card-title h5 fw-bold">Address Classification</h3>
+                                <p class="card-text">Intelligent classification of addresses into categories like Rookie, Whale Trader, Bot, and more.</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="glass-card h-100 p-4 text-center" data-aos="fade-left">
-                                    <div class="mb-3">
-                                        <i class="fa fa-flag fa-3x text-primary"></i>
-                                    </div>
-                                    <h3 class="card-title h5">Flag Suspicious Activity</h3>
-                                    <p class="card-text">Mark suspicious transactions and help protect the community.</p>
+                                <div class="mb-3">
+                                    <i class="fa fa-flag fa-3x text-primary"></i>
+                                </div>
+                                <h3 class="card-title h5 fw-bold">Flag Suspicious Activity</h3>
+                                <p class="card-text">Community-driven flagging system to mark suspicious transactions and protect users.</p>
                             </div>
                         </div>
                     </div>
@@ -179,45 +200,83 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6" data-aos="fade-right">
-                    <h2>Identify Wallet Categories</h2>
-                    <p class="lead">Our advanced classification system can identify:</p>
-                    <ul class="list-group list-group-flush bg-transparent mb-4">
-                        <li class="list-group-item bg-transparent text-white border-secondary">
-                            <i class="fa fa-user-o me-2"></i> Rookie
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary">
-                            <i class="fa fa-money me-2"></i> Whale Trader
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary">
-                            <i class="fa fa-android me-2"></i> Bot
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary">
-                            <i class="fa fa-warning me-2"></i> Hacker
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary">
-                            <i class="fa fa-shield me-2"></i> Whitehat
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary">
-                            <i class="fa fa-parachute-box me-2"></i> Airdrop Hunter
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary">
-                            <i class="fa fa-exchange me-2"></i> Liquidity Provider
-                        </li>
-                    </ul>
-                    <a href="{{ url_for('login') }}" class="btn btn-outline-light">Try It Now</a>
+                    <h2 class="fw-bold mb-4">Identify Wallet Categories</h2>
+                    <p class="lead mb-4">Our advanced classification system can identify:</p>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="glass-card p-3 text-center">
+                                <i class="fa fa-user-o fa-2x text-primary mb-2"></i>
+                                <h5 class="fw-bold">Rookie</h5>
+                                <small class="text-muted">New to crypto</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="glass-card p-3 text-center">
+                                <i class="fa fa-money fa-2x text-success mb-2"></i>
+                                <h5 class="fw-bold">Whale Trader</h5>
+                                <small class="text-muted">Large volume trader</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="glass-card p-3 text-center">
+                                <i class="fa fa-android fa-2x text-info mb-2"></i>
+                                <h5 class="fw-bold">Bot</h5>
+                                <small class="text-muted">Automated trading</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="glass-card p-3 text-center">
+                                <i class="fa fa-warning fa-2x text-danger mb-2"></i>
+                                <h5 class="fw-bold">Hacker</h5>
+                                <small class="text-muted">Suspicious activity</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="glass-card p-3 text-center">
+                                <i class="fa fa-shield fa-2x text-warning mb-2"></i>
+                                <h5 class="fw-bold">Whitehat</h5>
+                                <small class="text-muted">Security researcher</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="glass-card p-3 text-center">
+                                <i class="fa fa-gift fa-2x text-purple mb-2"></i>
+                                <h5 class="fw-bold">Airdrop</h5>
+                                <small class="text-muted">Token distribution</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-6" data-aos="fade-left">
                     <div class="glass-card p-4">
-                            <h4>Chrome Extension</h4>
-                            <p>Protect yourself while browsing Web3 sites with our Chrome extension.</p>
-                            <ul>
-                                <li>Scan pages for Ethereum addresses</li>
-                                <li>Display reputation tags on hover</li>
-                                <li>Flag suspicious addresses</li>
-                            </ul>
-                        <a href="{{ url_for('static', filename='chrome_extension.zip') }}" class="btn btn-3d">
-                                <i class="fa fa-download me-2"></i>Download Extension
-                            </a>
+                        <h3 class="fw-bold mb-3">How It Works</h3>
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
+                                <span class="text-white fw-bold">1</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold">Connect Wallet</h5>
+                                <p class="text-muted mb-0">Connect your Ethereum wallet to get started</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
+                                <span class="text-white fw-bold">2</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold">Analyze Transactions</h5>
+                                <p class="text-muted mb-0">Our AI analyzes your transaction history</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; min-width: 40px;">
+                                <span class="text-white fw-bold">3</span>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold">Get Insights</h5>
+                                <p class="text-muted mb-0">Receive detailed analysis and recommendations</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -234,13 +293,11 @@
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
-        // Init AOS
         AOS.init({
             duration: 900,
             once: true,
             offset: 80
         });
-        // Animated counters
         function animateCounter(id, end, duration) {
             let start = 0;
             const step = Math.ceil(end / (duration / 16));
@@ -259,7 +316,6 @@
         animateCounter('counter-users', 1200, 1200);
         animateCounter('counter-tx', 48000, 1200);
         animateCounter('counter-flags', 320, 1200);
-        // Dark/Light mode toggle
         const toggleBtn = document.getElementById('toggleMode');
         toggleBtn.addEventListener('click', function() {
             document.body.classList.toggle('light-mode');

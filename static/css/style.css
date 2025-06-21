@@ -92,7 +92,7 @@ body {
     -webkit-backdrop-filter: blur(12px);
     border-radius: 24px;
     border: 1.5px solid rgba(255,255,255,0.12);
-    transition: transform 0.3s cubic-bezier(.25,.8,.25,1), box-shadow 1.5s;
+    transition: transform 1.5s cubic-bezier(.25,.8,.25,1), box-shadow 1.5s;
     will-change: transform;
 }
 .glass-card:hover {

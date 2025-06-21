@@ -6,10 +6,44 @@
     <title>Search Results - TrustMark</title>
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .toggle-switch {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+        .svg-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <svg class="svg-bg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="grad1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#5f72ff" stop-opacity="0.18"/>
+                <stop offset="100%" stop-color="#9a5cff" stop-opacity="0.12"/>
+            </linearGradient>
+        </defs>
+        <ellipse cx="900" cy="200" rx="400" ry="180" fill="url(#grad1)">
+            <animate attributeName="cx" values="900;700;900" dur="8s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="400" cy="700" rx="300" ry="120" fill="url(#grad1)">
+            <animate attributeName="cy" values="700;600;700" dur="10s" repeatCount="indefinite"/>
+        </ellipse>
+    </svg>
+    <div class="toggle-switch">
+        <button id="toggleMode" class="btn btn-3d" title="Toggle dark/light mode">
+            <i class="fa fa-moon"></i>
+        </button>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark animated-border" data-aos="fade-down">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fa fa-shield me-2"></i>TrustMark
@@ -35,18 +69,17 @@
             </div>
         </div>
     </nav>
-
-    <div class="container py-4">
+    <div class="container py-4 position-relative" style="z-index:1;">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}" data-aos="fade-down">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        
         <div class="row mb-4">
             <div class="col-md-8">
+                <div class="glass-card p-4 mb-4" data-aos="fade-right">
                 <h1 class="mb-3">Address Analysis</h1>
                 <div class="d-flex align-items-center flex-wrap">
                     <div class="me-3 mb-2">
@@ -72,22 +105,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 text-md-end">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <a href="{{ url_for('search') }}" class="btn btn-outline-light">
-                        <i class="fa fa-arrow-left me-1"></i> New Search
-                    </a>
-                    <a href="https://etherscan.io/address/{{ address }}" target="_blank" class="btn btn-info">
-                        <i class="fa fa-external-link me-1"></i> View on Etherscan
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-dark">
+                <div class="glass-card mb-4" data-aos="fade-up">
+                    <div class="card-header bg-dark rounded-3 mb-3">
                         <h5 class="mb-0">Transaction History</h5>
                     </div>
                     <div class="card-body p-0">
@@ -157,17 +176,15 @@
                     </div>
                 </div>
             </div>
-            
             <div class="col-md-4">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-dark">
+                <div class="glass-card p-4 mb-4" data-aos="fade-left">
+                    <div class="card-header bg-dark rounded-3 mb-3">
                         <h5 class="mb-0">Categorization Details</h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
                             <h6>Classification: <span class="badge bg-primary">{{ category }}</span></h6>
                         </div>
-                        
                         <h6>Classification Criteria:</h6>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item bg-transparent">
@@ -194,22 +211,21 @@
                         </ul>
                     </div>
                 </div>
-                
-                <div class="card shadow-sm">
-                    <div class="card-header bg-dark">
+                <div class="glass-card p-4 mb-4" data-aos="fade-left" data-aos-delay="100">
+                    <div class="card-header bg-dark rounded-3 mb-3">
                         <h5 class="mb-0">Actions</h5>
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
                             {% if logged_in %}
                                 {% if is_my_address %}
-                                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                                    <a href="{{ url_for('dashboard') }}" class="btn btn-3d" title="Go to your dashboard">
                                         <i class="fa fa-tachometer me-1"></i> Go to Dashboard
                                     </a>
                                 {% else %}
                                     <form action="{{ url_for('login') }}" method="post">
                                         <input type="hidden" name="wallet_address" value="{{ address }}">
-                                        <button type="submit" class="btn btn-primary w-100">
+                                        <button type="submit" class="btn btn-3d w-100" title="Login as this address">
                                             <i class="fa fa-sign-in me-1"></i> Login as This Address
                                         </button>
                                     </form>
@@ -217,12 +233,12 @@
                             {% else %}
                                 <form action="{{ url_for('login') }}" method="post">
                                     <input type="hidden" name="wallet_address" value="{{ address }}">
-                                    <button type="submit" class="btn btn-primary w-100">
+                                    <button type="submit" class="btn btn-3d w-100" title="Login as this address">
                                         <i class="fa fa-sign-in me-1"></i> Login as This Address
                                     </button>
                                 </form>
                             {% endif %}
-                            <a href="https://etherscan.io/address/{{ address }}" target="_blank" class="btn btn-outline-info">
+                            <a href="https://etherscan.io/address/{{ address }}" target="_blank" class="btn btn-outline-info" title="View on Etherscan">
                                 <i class="fa fa-external-link me-1"></i> View on Etherscan
                             </a>
                         </div>
@@ -231,13 +247,26 @@
             </div>
         </div>
     </div>
-
     <footer class="py-4 bg-dark text-white-50 mt-5">
         <div class="container text-center">
             <small>&copy; 2023 TrustMark Protocol | <a href="#" class="text-white">Terms</a> | <a href="#" class="text-white">Privacy</a></small>
         </div>
     </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        // Init AOS
+        AOS.init({
+            duration: 900,
+            once: true,
+            offset: 80
+        });
+        // Dark/Light mode toggle
+        const toggleBtn = document.getElementById('toggleMode');
+        toggleBtn.addEventListener('click', function() {
+            document.body.classList.toggle('light-mode');
+            this.innerHTML = document.body.classList.contains('light-mode') ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustMark Extension Test Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            color: #212529;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+        .address-section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        .address-section h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #495057;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5rem;
+        }
+        .test-address {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+        }
+        .info-box {
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2.5rem;
+        }
+        .info-box.info {
+            background-color: #e7f3ff;
+            border-left: 5px solid #0d6efd;
+        }
+        .info-box.warning {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TrustMark Extension Test Page</h1>
+        
+        <div class="info-box info">
+            <strong>How to Test:</strong>
+            <ol style="padding-left: 20px; margin-top: 10px;">
+                <li>Make sure your local Flask server is running.</li>
+                <li>Ensure the TrustMark Chrome extension is installed and enabled.</li>
+                <li>Observe how the addresses below are highlighted based on their status in the database.</li>
+            </ol>
+        </div>
+
+        <div class="info-box warning">
+            <strong>Expected Behavior:</strong>
+            <ul style="padding-left: 20px; margin-top: 10px;">
+                <li><strong>Red Badges (Hacker):</strong> Applied to addresses confirmed to be malicious.</li>
+                <li><strong>Orange Badges (Suspicious):</strong> Applied to addresses with questionable activity.</li>
+                <li><strong>Blue Badges (Normal):</strong> Applied to any other standard Ethereum address.</li>
+            </ul>
+        </div>
+
+        <div class="address-section">
+            <h3>Flagged Addresses (Should have RED or ORANGE badges)</h3>
+            <div class="test-address">This address is flagged as a hacker: 0xDa9dfA130Df4dE4673b89022EE50ff26f6EA73Cf</div>
+            <div class="test-address">This one is suspicious: 0x4f655e4D5A245A6d7543867389A531A381015696</div>
+            <div class="test-address">And another suspicious address: 0xb247d4b1548810214a3a6931448956922533e4B3</div>
+        </div>
+
+        <div class="address-section">
+            <h3>Normal Addresses (Should have BLUE badges)</h3>
+            <div class="test-address">A standard, unflagged address: 0x1A2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b</div>
+            <div class="test-address">Vitalik Buterin's address: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045</div>
+            <div class="test-address">An arbitrary test address: 0x00112233445566778899AABBCCDDEEFF00112233</div>
+        </div>
+
+    </div>
+</body>
+</html> 

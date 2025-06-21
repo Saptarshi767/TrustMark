@@ -2,16 +2,12 @@
  * TrustMark Chrome Extension Popup Script
  */
 
-// Demo categories to simulate address classification
-const demoCategories = [
-  'Rookie', 
-  'Whale Trader', 
-  'Bot', 
-  'Hacker', 
-  'Whitehat', 
-  'Airdrop Hunter', 
-  'Liquidity Provider'
-];
+// IMPORTANT: Replace this with your deployed Vercel URL
+const BACKEND_URL = 'https://YOUR_VERCEL_PROJECT_URL.vercel.app';
+
+// Store flagged addresses
+let flaggedAddresses = [];
+let suspiciousAddresses = [];
 
 // Category badge classes
 const categoryClasses = {
@@ -21,8 +17,31 @@ const categoryClasses = {
   'Hacker': 'bg-danger',
   'Whitehat': 'bg-success',
   'Airdrop Hunter': 'bg-warning',
-  'Liquidity Provider': 'bg-info'
+  'Liquidity Provider': 'bg-info',
+  'Flagged': 'bg-danger',
+  'Suspicious': 'bg-warning'
 };
+
+// Fetch flagged addresses from backend
+async function fetchFlaggedAddresses() {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/flagged_addresses`);
+    if (response.ok) {
+      const data = await response.json();
+      flaggedAddresses = data.flagged_addresses || [];
+      suspiciousAddresses = data.suspicious_addresses || [];
+      console.log('TrustMark: Loaded flagged addresses:', flaggedAddresses.length);
+      console.log('TrustMark: Loaded suspicious addresses:', suspiciousAddresses.length);
+      return true;
+    } else {
+      console.warn('TrustMark: Failed to fetch flagged addresses:', response.status);
+      return false;
+    }
+  } catch (error) {
+    console.warn('TrustMark: Error fetching flagged addresses:', error);
+    return false;
+  }
+}
 
 // Function to scan the current page for Ethereum addresses
 function scanPageForAddresses() {
@@ -45,6 +64,17 @@ function scanPageForAddresses() {
   });
 }
 
+// Function to check if an address is flagged or suspicious
+function getAddressStatus(address) {
+  const lowerAddress = address.toLowerCase();
+  if (flaggedAddresses.some(addr => addr.toLowerCase() === lowerAddress)) {
+    return 'Flagged';
+  } else if (suspiciousAddresses.some(addr => addr.toLowerCase() === lowerAddress)) {
+    return 'Suspicious';
+  }
+  return 'Normal';
+}
+
 // Function to display found Ethereum addresses
 function displayAddresses(addresses) {
   const resultsContainer = document.getElementById('scanResults');
@@ -56,21 +86,20 @@ function displayAddresses(addresses) {
   
   let html = '';
   addresses.forEach(address => {
-    // Assign a random category for demo purposes
-    const randomCategory = demoCategories[Math.floor(Math.random() * demoCategories.length)];
-    const badgeClass = categoryClasses[randomCategory] || 'bg-secondary';
+    const status = getAddressStatus(address);
+    const badgeClass = categoryClasses[status] || 'bg-secondary';
     
     html += `
       <div class="address-item">
         <div class="d-flex justify-content-between align-items-start">
           <div class="text-truncate me-2">${address}</div>
-          <span class="badge ${badgeClass}">${randomCategory}</span>
+          <span class="badge ${badgeClass}">${status}</span>
         </div>
         <div class="mt-2 d-flex gap-1">
           <button class="btn btn-sm btn-outline-warning btn-flag" data-address="${address}">
             <i class="fa fa-flag-o"></i> Flag
           </button>
-          <a href="https://trustmark-replit.com/dashboard?address=${address}" target="_blank" class="btn btn-sm btn-outline-primary">
+          <a href="${BACKEND_URL}/search?address=${address}" target="_blank" class="btn btn-sm btn-outline-primary">
             <i class="fa fa-external-link"></i> View
           </a>
         </div>
@@ -117,22 +146,55 @@ function displayError(message) {
   `;
 }
 
-// Set up event listeners when the popup loads
-document.addEventListener('DOMContentLoaded', function() {
-  // Scan button click handler
-  document.getElementById('scanPageBtn').addEventListener('click', scanPageForAddresses);
-  
-  // Simulate scanning the page automatically when popup opens
-  // For demo, we'll just show a loading indicator
+// Function to display loading message
+function displayLoading() {
   const resultsContainer = document.getElementById('scanResults');
   resultsContainer.innerHTML = `
     <div class="text-center py-3">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-      <p class="mt-2 text-muted">Ready to scan...</p>
+      <p class="mt-2 text-muted">Loading TrustMark data...</p>
     </div>
   `;
+}
+
+// Set up event listeners when the popup loads
+document.addEventListener('DOMContentLoaded', async function() {
+  // Set the dashboard link href dynamically
+  const dashboardLink = document.getElementById('dashboardLink');
+  if(dashboardLink) {
+    dashboardLink.href = `${BACKEND_URL}/login`;
+  }
+  
+  // Show loading initially
+  displayLoading();
+  
+  // Fetch flagged addresses from backend
+  const success = await fetchFlaggedAddresses();
+  
+  if (success) {
+    // Scan button click handler
+    document.getElementById('scanPageBtn').addEventListener('click', scanPageForAddresses);
+    
+    // Show ready message
+    const resultsContainer = document.getElementById('scanResults');
+    resultsContainer.innerHTML = `
+      <div class="text-center py-3">
+        <i class="fa fa-check-circle text-success mb-2 d-block" style="font-size: 2rem;"></i>
+        <p class="text-muted">TrustMark ready!</p>
+        <p class="small text-muted">Found ${flaggedAddresses.length} flagged and ${suspiciousAddresses.length} suspicious addresses</p>
+        <button id="scanPageBtn" class="btn btn-primary btn-sm">
+          <i class="fa fa-search"></i> Scan Page
+        </button>
+      </div>
+    `;
+    
+    // Add click handler to the new scan button
+    document.getElementById('scanPageBtn').addEventListener('click', scanPageForAddresses);
+  } else {
+    displayError("Could not connect to TrustMark backend. Make sure your Flask server is running on localhost:5000");
+  }
 });
 
 // Function to mock scanning process (for demo purposes)

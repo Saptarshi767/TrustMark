@@ -67,11 +67,17 @@
                                 <div class="form-text">Enter a valid Ethereum address (starts with 0x).</div>
                             </div>
                             
+                            <div class="d-grid gap-2 mb-3">
+                                <button type="button" class="btn btn-warning" id="metamaskLoginBtn" title="Connect with MetaMask wallet">
+                                    <img src="https://cdn.iconscout.com/icon/free/png-256/free-metamask-2728406-2261817.png" alt="MetaMask" style="width: 24px; vertical-align: middle; margin-right: 8px;">Connect with MetaMask
+                                </button>
+                            </div>
+                            
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fa fa-plug me-2"></i>Connect Wallet
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" id="demoAddressBtn">
+                                <button type="button" class="btn btn-outline-secondary" id="demoAddressBtn" title="Use a demo Ethereum address for login">
                                     Use Demo Address
                                 </button>
                             </div>
@@ -104,6 +110,45 @@
         // Demo address button - for easy testing
         document.getElementById('demoAddressBtn').addEventListener('click', function() {
             document.getElementById('wallet_address').value = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
+            // Submit the form automatically
+            this.closest('form').submit();
+        });
+
+        // MetaMask login logic
+        document.getElementById('metamaskLoginBtn').addEventListener('click', async function() {
+            if (!window.ethereum) {
+                alert('MetaMask is not installed.');
+                return;
+            }
+            try {
+                // 1. Request account
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const address = accounts[0];
+                // 2. Fetch nonce from backend
+                const nonceResp = await fetch('/api/nonce?address=' + address);
+                const nonceData = await nonceResp.json();
+                if (!nonceData.nonce) throw new Error('Failed to get nonce');
+                // 3. Ask user to sign the nonce
+                const msg = `Sign this message to login: ${nonceData.nonce}`;
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [msg, address],
+                });
+                // 4. Send address and signature to backend
+                const authResp = await fetch('/api/authenticate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address, signature, nonce: nonceData.nonce })
+                });
+                const authData = await authResp.json();
+                if (authData.success) {
+                    window.location.href = '/dashboard';
+                } else {
+                    alert('Authentication failed: ' + (authData.message || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('MetaMask login failed: ' + err.message);
+            }
         });
     </script>
 </body>

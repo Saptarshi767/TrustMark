@@ -6,10 +6,44 @@
     <title>Search - TrustMark</title>
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .toggle-switch {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+        .svg-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <svg class="svg-bg" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="grad1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#5f72ff" stop-opacity="0.18"/>
+                <stop offset="100%" stop-color="#9a5cff" stop-opacity="0.12"/>
+            </linearGradient>
+        </defs>
+        <ellipse cx="900" cy="200" rx="400" ry="180" fill="url(#grad1)">
+            <animate attributeName="cx" values="900;700;900" dur="8s" repeatCount="indefinite"/>
+        </ellipse>
+        <ellipse cx="400" cy="700" rx="300" ry="120" fill="url(#grad1)">
+            <animate attributeName="cy" values="700;600;700" dur="10s" repeatCount="indefinite"/>
+        </ellipse>
+    </svg>
+    <div class="toggle-switch">
+        <button id="toggleMode" class="btn btn-3d" title="Toggle dark/light mode">
+            <i class="fa fa-moon"></i>
+        </button>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark animated-border" data-aos="fade-down">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fa fa-shield me-2"></i>TrustMark
@@ -35,30 +69,27 @@
             </div>
         </div>
     </nav>
-
-    <div class="container py-4">
+    <div class="container py-4 position-relative" style="z-index:1;">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}" data-aos="fade-down">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        
         <div class="row mb-4">
             <div class="col-md-12">
-                <h1 class="mb-3">Search Ethereum Addresses</h1>
-                <div class="alert alert-info">
+                <h1 class="mb-3" data-aos="fade-up">Search Ethereum Addresses</h1>
+                <div class="alert alert-info" data-aos="fade-up" data-aos-delay="100">
                     <i class="fa fa-info-circle me-2"></i>
                     Enter any Ethereum address to analyze its transactions and reputation.
                 </div>
             </div>
         </div>
-        
         <div class="row">
             <div class="col-md-8 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-dark">
+                <div class="glass-card p-4" data-aos="fade-right">
+                    <div class="card-header bg-dark rounded-3 mb-3">
                         <h5 class="mb-0">Address Lookup</h5>
                     </div>
                     <div class="card-body">
@@ -72,14 +103,13 @@
                                     <input type="text" class="form-control" id="address" name="address" 
                                            placeholder="0x..." required
                                            value="{{ request.args.get('address', '') }}">
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="submit" class="btn btn-3d" title="Analyze address">
                                         <i class="fa fa-search me-1"></i> Analyze
                                     </button>
                                 </div>
                                 <div class="form-text">Enter a valid Ethereum address starting with 0x</div>
                             </div>
                         </form>
-                        
                         <div class="mt-4">
                             <h6>Example addresses to try:</h6>
                             <div class="list-group">
@@ -109,10 +139,9 @@
                     </div>
                 </div>
             </div>
-            
             <div class="col-md-4">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-dark">
+                <div class="glass-card p-4 mb-4" data-aos="fade-left">
+                    <div class="card-header bg-dark rounded-3 mb-3">
                         <h5 class="mb-0">About TrustMark Search</h5>
                     </div>
                     <div class="card-body">
@@ -148,13 +177,26 @@
             </div>
         </div>
     </div>
-
     <footer class="py-4 bg-dark text-white-50 mt-5">
         <div class="container text-center">
             <small>&copy; 2023 TrustMark Protocol | <a href="#" class="text-white">Terms</a> | <a href="#" class="text-white">Privacy</a></small>
         </div>
     </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        // Init AOS
+        AOS.init({
+            duration: 900,
+            once: true,
+            offset: 80
+        });
+        // Dark/Light mode toggle
+        const toggleBtn = document.getElementById('toggleMode');
+        toggleBtn.addEventListener('click', function() {
+            document.body.classList.toggle('light-mode');
+            this.innerHTML = document.body.classList.contains('light-mode') ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
+        });
+    </script>
 </body>
 </html>

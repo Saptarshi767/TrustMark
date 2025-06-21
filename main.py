@@ -3,10 +3,12 @@ import logging
 from datetime import datetime
 from collections import Counter, defaultdict
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify, flash
-from utils.blockchain import get_user_transactions as get_mock_transactions
 from utils.etherscan_api import get_transaction_history, get_ether_balance, get_transaction_details
 from utils.classifier import classify_address
 from models import db, FlaggedTransaction
+from web3 import Web3
+import secrets
+from dotenv import load_dotenv
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -15,8 +17,27 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trustmark-dev-secret")
 
-# Configure the database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+# Add CORS support for Chrome extension
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
+
+# --- Database Configuration ---
+# Use Vercel Postgres URL if available (for production), otherwise use local SQLite
+if os.environ.get("POSTGRES_URL"):
+    # In production, use the Vercel Postgres database
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("POSTGRES_URL").replace("postgres://", "postgresql://")
+    print("Connecting to Vercel Postgres DB.")
+else:
+    # For local development, use SQLite
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'trustmark.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+    print(f"Connecting to local SQLite DB at {db_path}")
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
@@ -72,15 +93,13 @@ def dashboard():
     # Get real transactions from Etherscan API
     try:
         transactions = get_transaction_history(wallet_address)
-        
-        # Fallback to mock data if no transactions or API error
         if not transactions:
-            logging.warning(f"No transactions found for {wallet_address} from Etherscan API, using mock data")
-            transactions = get_mock_transactions(wallet_address)
+            flash('No transactions found for this address.', 'info')
+            transactions = []
     except Exception as e:
         logging.error(f"Error fetching transactions from Etherscan: {str(e)}")
-        # Fallback to mock data
-        transactions = get_mock_transactions(wallet_address)
+        flash('Error fetching transactions from Etherscan.', 'danger')
+        transactions = []
     
     # Get current balance
     try:
@@ -137,6 +156,27 @@ def get_flagged_transactions():
     return jsonify({
         'wallet_address': wallet_address,
         'flagged_transactions': flagged_list
+    })
+
+
+@app.route('/api/flagged_addresses')
+def get_flagged_addresses():
+    """API endpoint for Chrome extension to get all flagged addresses"""
+    # Get all unique flagged addresses from the database
+    flagged_addresses = db.session.query(FlaggedTransaction.wallet_address).distinct().all()
+    
+    # Convert to list of addresses
+    addresses = [addr[0] for addr in flagged_addresses]
+    
+    # Also get addresses that appear in flagged transactions (as they might be suspicious)
+    flagged_tx_addresses = db.session.query(FlaggedTransaction.wallet_address).all()
+    tx_addresses = [addr[0] for addr in flagged_tx_addresses]
+    
+    return jsonify({
+        'flagged_addresses': addresses,
+        'suspicious_addresses': tx_addresses,
+        'total_flagged': len(addresses),
+        'total_suspicious': len(tx_addresses)
     })
 
 
@@ -225,16 +265,13 @@ def flag_transaction():
             logging.error(f"Error fetching transaction details from Etherscan: {str(e)}")
             tx_details = None
             
-        # If not found, fallback to mock or recent transactions
+        # If not found, try to find in recent transactions
         if not tx_details:
             try:
                 transactions = get_transaction_history(wallet_address)
-                if not transactions:
-                    transactions = get_mock_transactions(wallet_address)
                 tx_details = next((tx for tx in transactions if tx['tx_hash'] == tx_hash), None)
             except Exception:
-                transactions = get_mock_transactions(wallet_address)
-                tx_details = next((tx for tx in transactions if tx['tx_hash'] == tx_hash), None)
+                tx_details = None
         
         # Create new flag
         new_flag = FlaggedTransaction()
@@ -281,11 +318,6 @@ def transaction_details(tx_hash):
             tx = next((t for t in transactions if t['tx_hash'] == tx_hash), None)
         except Exception:
             tx = None
-    
-    # If still not found, check mock data
-    if not tx:
-        transactions = get_mock_transactions(wallet_address)
-        tx = next((t for t in transactions if t['tx_hash'] == tx_hash), None)
     
     if not tx:
         flash('Transaction not found', 'danger')
@@ -363,5 +395,43 @@ def logout():
     session.pop('wallet_address', None)
     return redirect(url_for('index'))
 
+@app.route('/api/nonce')
+def get_nonce():
+    address = request.args.get('address')
+    if not address or not address.startswith('0x'):
+        return jsonify({'error': 'Invalid address'}), 400
+    nonce = secrets.token_hex(16)
+    session['siwe_nonce'] = nonce
+    session['siwe_address'] = address.lower()
+    return jsonify({'nonce': nonce})
+
+@app.route('/api/authenticate', methods=['POST'])
+def authenticate():
+    data = request.get_json()
+    address = data.get('address', '').lower()
+    signature = data.get('signature')
+    nonce = data.get('nonce')
+    expected_nonce = session.get('siwe_nonce')
+    expected_address = session.get('siwe_address')
+    if not (address and signature and nonce and expected_nonce and expected_address):
+        return jsonify({'success': False, 'message': 'Missing data'}), 400
+    if nonce != expected_nonce or address != expected_address:
+        return jsonify({'success': False, 'message': 'Invalid nonce or address'}), 400
+    # Verify signature
+    w3 = Web3()
+    message = f'Sign this message to login: {nonce}'
+    try:
+        recovered = w3.eth.account.recover_message(text=message, signature=signature)
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Signature verification failed: {str(e)}'}), 400
+    if recovered.lower() != address:
+        return jsonify({'success': False, 'message': 'Signature does not match address'}), 400
+    # Success: log in user
+    session['wallet_address'] = address
+    session.pop('siwe_nonce', None)
+    session.pop('siwe_address', None)
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
+    load_dotenv()
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -6,10 +6,24 @@
     <title>Dashboard - TrustMark</title>
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .toggle-switch {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="toggle-switch">
+        <button id="toggleMode" class="btn btn-3d" title="Toggle dark/light mode">
+            <i class="fa fa-moon"></i>
+        </button>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark animated-border" data-aos="fade-down">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fa fa-shield me-2"></i>TrustMark
@@ -43,15 +57,15 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}" data-aos="fade-down">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        
         <div class="row mb-4">
             <div class="col-md-8">
+                <div class="glass-card p-4 mb-4" data-aos="zoom-in">
                 <h1 class="mb-3">User Dashboard</h1>
-                <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center mb-3">
                     <div class="me-3">
                         <span class="badge bg-dark p-2">
                             <i class="fa fa-wallet me-1"></i> {{ wallet_address }}
@@ -68,6 +82,26 @@
                         </span>
                     </div>
                 </div>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="glass-card p-3 mb-2" data-aos="fade-up" data-aos-delay="100">
+                                <h2 class="fw-bold mb-1" style="font-size:2.2rem"><span id="counter-tx">0</span>+</h2>
+                                <div class="text-muted">Transactions</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card p-3 mb-2" data-aos="fade-up" data-aos-delay="200">
+                                <h2 class="fw-bold mb-1" style="font-size:2.2rem"><span id="counter-flags">0</span>+</h2>
+                                <div class="text-muted">Flags Raised</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card p-3 mb-2" data-aos="fade-up" data-aos-delay="300">
+                                <h2 class="fw-bold mb-1" style="font-size:2.2rem"><span id="counter-category">0</span></h2>
+                                <div class="text-muted">Category Score</div>
+                            </div>
+                    </div>
+                </div>
                 <div class="mt-2">
                     <div class="alert alert-info">
                         <i class="fa fa-database me-1"></i> Flagged transactions are now stored in a database! 
@@ -76,25 +110,25 @@
                     <div class="alert alert-success">
                         <i class="fa fa-exchange me-1"></i> <strong>We're now using real Etherscan data!</strong> 
                         Displaying actual transactions from the Ethereum blockchain.
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 text-md-end">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <a href="{{ url_for('flagged_stats') }}" class="btn btn-info">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end" data-aos="fade-left">
+                    <a href="{{ url_for('flagged_stats') }}" class="btn btn-info" title="View flag stats">
                         <i class="fa fa-chart-bar me-1"></i> Flag Stats
                     </a>
-                    <button class="btn btn-outline-light" onclick="window.print()">
+                    <button class="btn btn-outline-light" onclick="window.print()" title="Print dashboard">
                         <i class="fa fa-print me-1"></i> Print
                     </button>
-                    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger" title="Disconnect wallet">
                         <i class="fa fa-sign-out me-1"></i> Disconnect
                     </a>
                 </div>
             </div>
         </div>
-        
-        <div class="card shadow-sm mb-4">
+        <div class="glass-card shadow-sm mb-4" data-aos="fade-up">
             <div class="card-header bg-dark">
                 <h5 class="mb-0">Transaction History</h5>
             </div>
@@ -191,278 +225,47 @@
                 </div>
             </div>
         </div>
-        
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-dark">
-                        <h5 class="mb-0">Categorization Details</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <h6>Classification: <span class="badge bg-primary">{{ category }}</span></h6>
-                        </div>
-                        
-                        <h6>Classification Criteria:</h6>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item bg-transparent">
-                                <strong>Rookie:</strong> Less than 5 transactions
-                            </li>
-                            <li class="list-group-item bg-transparent">
-                                <strong>Bot:</strong> More than 10 contract calls
-                            </li>
-                            <li class="list-group-item bg-transparent">
-                                <strong>Whale Trader:</strong> Transaction volume > 100,000 ETH
-                            </li>
-                            <li class="list-group-item bg-transparent">
-                                <strong>Airdrop Hunter:</strong> Has airdrop transactions
-                            </li>
-                            <li class="list-group-item bg-transparent">
-                                <strong>Hacker:</strong> Has exploit transactions
-                            </li>
-                            <li class="list-group-item bg-transparent">
-                                <strong>Whitehat:</strong> Has audit transactions
-                            </li>
-                            <li class="list-group-item bg-transparent">
-                                <strong>Liquidity Provider:</strong> Multiple high-volume transactions
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-dark">
-                        <h5 class="mb-0">Flagged Transactions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="flagged-transactions">
-                            <!-- This will be populated with JavaScript -->
-                            <div class="alert alert-secondary">
-                                No transactions have been flagged yet.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">
-                            <i class="fa fa-info-circle me-1"></i>
-                            Flagged transactions help improve our classification system.
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- More dashboard content can go here, e.g., charts, stats, etc. -->
     </div>
-
     <footer class="py-4 bg-dark text-white-50 mt-5">
         <div class="container text-center">
             <small>&copy; 2023 TrustMark Protocol | <a href="#" class="text-white">Terms</a> | <a href="#" class="text-white">Privacy</a></small>
         </div>
     </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Flag option click handlers
-            const flagOptions = document.querySelectorAll('.flag-option');
-            flagOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    const txHash = this.getAttribute('data-tx-hash');
-                    const reason = this.getAttribute('data-reason');
-                    
-                    // Send flag request with reason
-                    const formData = new FormData();
-                    formData.append('tx_hash', txHash);
-                    formData.append('flag_reason', reason);
-                    
-                    fetch('/flag_tx', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Get the parent dropdown button
-                            const dropdownBtn = document.querySelector(`.flag-btn[data-tx-hash="${txHash}"]`);
-                            
-                            // Update button UI
-                            dropdownBtn.innerHTML = `<i class="fa fa-flag"></i> Flagged: ${data.reason.charAt(0).toUpperCase() + data.reason.slice(1)}`;
-                            dropdownBtn.setAttribute('data-flagged', 'true');
-                            dropdownBtn.classList.remove('btn-outline-warning');
-                            dropdownBtn.classList.add('btn-warning');
-                            
-                            // Update dropdown menu
-                            const dropdownMenu = dropdownBtn.nextElementSibling;
-                            dropdownMenu.innerHTML = `<li><button class="dropdown-item unflag-option" data-tx-hash="${txHash}"><i class="fa fa-times"></i> Remove Flag</button></li>`;
-                            
-                            // Add event listener to the new unflag option
-                            attachUnflagListeners();
-                            
-                            // Update flagged transactions section
-                            updateFlaggedTransactionsView();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Failed to update flag status');
-                    });
-                });
-            });
-            
-            // Function to attach unflag event listeners
-            function attachUnflagListeners() {
-                const unflagOptions = document.querySelectorAll('.unflag-option');
-                unflagOptions.forEach(option => {
-                    if (!option.hasEventListener) {
-                        option.hasEventListener = true;  // Mark to prevent duplicate listeners
-                        option.addEventListener('click', function() {
-                            const txHash = this.getAttribute('data-tx-hash');
-                            
-                            // Send unflag request
-                            const formData = new FormData();
-                            formData.append('tx_hash', txHash);
-                            
-                            fetch('/flag_tx', {
-                                method: 'POST',
-                                body: formData
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    // Get the parent dropdown button
-                                    const dropdownBtn = document.querySelector(`.flag-btn[data-tx-hash="${txHash}"]`);
-                                    
-                                    // Update button UI
-                                    dropdownBtn.innerHTML = '<i class="fa fa-flag-o"></i> Flag';
-                                    dropdownBtn.setAttribute('data-flagged', 'false');
-                                    dropdownBtn.classList.remove('btn-warning');
-                                    dropdownBtn.classList.add('btn-outline-warning');
-                                    
-                                    // Update dropdown menu with flag options
-                                    const dropdownMenu = dropdownBtn.nextElementSibling;
-                                    dropdownMenu.innerHTML = `
-                                        <li><button class="dropdown-item flag-option" data-tx-hash="${txHash}" data-reason="suspicious"><i class="fa fa-exclamation-triangle"></i> Suspicious</button></li>
-                                        <li><button class="dropdown-item flag-option" data-tx-hash="${txHash}" data-reason="scam"><i class="fa fa-ban"></i> Scam</button></li>
-                                        <li><button class="dropdown-item flag-option" data-tx-hash="${txHash}" data-reason="phishing"><i class="fa fa-user-secret"></i> Phishing</button></li>
-                                        <li><button class="dropdown-item flag-option" data-tx-hash="${txHash}" data-reason="fraud"><i class="fa fa-warning"></i> Fraud</button></li>
-                                    `;
-                                    
-                                    // Add event listeners to the new flag options
-                                    document.querySelectorAll(`.flag-option[data-tx-hash="${txHash}"]`).forEach(el => {
-                                        el.addEventListener('click', flagOptionClickHandler);
-                                    });
-                                    
-                                    // Update flagged transactions section
-                                    updateFlaggedTransactionsView();
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('Failed to update flag status');
-                            });
-                        });
-                    }
-                });
-            }
-            
-            // Function for flag option click handling (to allow reattaching)
-            function flagOptionClickHandler() {
-                const txHash = this.getAttribute('data-tx-hash');
-                const reason = this.getAttribute('data-reason');
-                
-                // Send flag request with reason
-                const formData = new FormData();
-                formData.append('tx_hash', txHash);
-                formData.append('flag_reason', reason);
-                
-                fetch('/flag_tx', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Get the parent dropdown button
-                        const dropdownBtn = document.querySelector(`.flag-btn[data-tx-hash="${txHash}"]`);
-                        
-                        // Update button UI
-                        dropdownBtn.innerHTML = `<i class="fa fa-flag"></i> Flagged: ${data.reason.charAt(0).toUpperCase() + data.reason.slice(1)}`;
-                        dropdownBtn.setAttribute('data-flagged', 'true');
-                        dropdownBtn.classList.remove('btn-outline-warning');
-                        dropdownBtn.classList.add('btn-warning');
-                        
-                        // Update dropdown menu
-                        const dropdownMenu = dropdownBtn.nextElementSibling;
-                        dropdownMenu.innerHTML = `<li><button class="dropdown-item unflag-option" data-tx-hash="${txHash}"><i class="fa fa-times"></i> Remove Flag</button></li>`;
-                        
-                        // Add event listener to the new unflag option
-                        attachUnflagListeners();
-                        
-                        // Update flagged transactions section
-                        updateFlaggedTransactionsView();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to update flag status');
-                });
-            }
-            
-            // Function to extract flag reason from button inner HTML
-            function extractFlagReason(html) {
-                // Check if html contains 'Flagged: '
-                if (html && html.includes('Flagged: ')) {
-                    // Extract the reason text that follows "Flagged: "
-                    const matches = html.match(/Flagged: (\w+)/);
-                    if (matches && matches.length > 1) {
-                        return matches[1];
-                    }
+        // Init AOS
+        AOS.init({
+            duration: 900,
+            once: true,
+            offset: 80
+        });
+        // Animated counters
+        function animateCounter(id, end, duration) {
+            let start = 0;
+            const step = Math.ceil(end / (duration / 16));
+            const el = document.getElementById(id);
+            function update() {
+                start += step;
+                if (start >= end) {
+                    el.textContent = end;
+                } else {
+                    el.textContent = start;
+                    requestAnimationFrame(update);
                 }
-                return 'Suspicious'; // Default reason
             }
-            
-            // Initialize by attaching unflag listeners
-            attachUnflagListeners();
-            
-            // Update flagged transactions view
-            function updateFlaggedTransactionsView() {
-                const flaggedTxs = document.querySelectorAll('.flag-btn[data-flagged="true"]');
-                const flaggedContainer = document.getElementById('flagged-transactions');
-                
-                if (flaggedTxs.length === 0) {
-                    flaggedContainer.innerHTML = '<div class="alert alert-secondary">No transactions have been flagged yet.</div>';
-                    return;
-                }
-                
-                let html = '<ul class="list-group">';
-                flaggedTxs.forEach(btn => {
-                    const txHash = btn.getAttribute('data-tx-hash');
-                    const row = document.getElementById(`tx-${txHash}`);
-                    const amount = row.cells[1].textContent.trim();
-                    const direction = row.cells[2].textContent.trim();
-                    
-                    html += `
-                        <li class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="text-truncate" style="max-width: 150px;">${txHash}</div>
-                                    <small>${direction} ${amount}</small>
-                                </div>
-                                <div>
-                                    <span class="badge bg-warning">Flagged</span>
-                                    <span class="badge bg-secondary">${extractFlagReason(btn.innerHTML)}</span>
-                                </div>
-                            </div>
-                        </li>
-                    `;
-                });
-                html += '</ul>';
-                
-                flaggedContainer.innerHTML = html;
-            }
-            
-            // Initial update of flagged transactions
-            updateFlaggedTransactionsView();
+            update();
+        }
+        animateCounter('counter-tx', {{ transactions|length }}, 1200);
+        animateCounter('counter-flags', {{ transactions|selectattr('flagged')|list|length }}, 1200);
+        animateCounter('counter-category', 1, 1200);
+        // Dark/Light mode toggle
+        const toggleBtn = document.getElementById('toggleMode');
+        toggleBtn.addEventListener('click', function() {
+            document.body.classList.toggle('light-mode');
+            this.innerHTML = document.body.classList.contains('light-mode') ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
         });
     </script>
 </body>

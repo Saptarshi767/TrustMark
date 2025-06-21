@@ -6,10 +6,24 @@
     <title>TrustMark - Decentralized Reputation Platform</title>
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .toggle-switch {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="toggle-switch">
+        <button id="toggleMode" class="btn btn-3d" title="Toggle dark/light mode">
+            <i class="fa fa-moon"></i>
+        </button>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark animated-border" data-aos="fade-down">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fa fa-shield me-2"></i>TrustMark
@@ -33,17 +47,83 @@
         </div>
     </nav>
 
-    <header class="py-5 bg-dark text-white text-center">
+    <header class="hero-3d text-white text-center mb-5" data-aos="zoom-in">
         <div class="container">
-            <h1 class="display-4 fw-bold mb-4">TrustMark</h1>
-            <p class="lead mb-4">A decentralized reputation tagging platform for Ethereum</p>
-            <div class="d-flex justify-content-center gap-3">
-                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Login with Wallet</a>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg">View Dashboard</a>
-                <a href="{{ url_for('static', filename='chrome_extension.zip') }}" class="btn btn-secondary btn-lg">
+            <h1 class="display-3 fw-bold mb-3" style="letter-spacing: 2px;">TrustMark</h1>
+            <p class="lead mb-4 fs-4">A decentralized reputation tagging platform for Ethereum</p>
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <a href="{{ url_for('login') }}" class="btn btn-3d btn-lg">Login with Wallet</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg" title="View your dashboard">View Dashboard</a>
+                <a href="{{ url_for('static', filename='chrome_extension.zip') }}" class="btn btn-secondary btn-lg" title="Download the Chrome extension">
                     <i class="fa fa-download me-2"></i>Download Extension
                 </a>
             </div>
+            <div class="row justify-content-center mt-4">
+                <div class="col-md-4">
+                    <div class="glass-card p-4 mb-3" data-aos="fade-up" data-aos-delay="100">
+                        <h2 class="display-6 fw-bold mb-1"><span id="counter-users">0</span>+</h2>
+                        <div class="text-muted">Wallets Analyzed</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-4 mb-3" data-aos="fade-up" data-aos-delay="200">
+                        <h2 class="display-6 fw-bold mb-1"><span id="counter-tx">0</span>+</h2>
+                        <div class="text-muted">Transactions Processed</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-4 mb-3" data-aos="fade-up" data-aos-delay="300">
+                        <h2 class="display-6 fw-bold mb-1"><span id="counter-flags">0</span>+</h2>
+                        <div class="text-muted">Flags Raised</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Custom Animated SVG 3D-like Background -->
+            <div class="hero-svg-bg position-absolute w-100 h-100" style="top:0;left:0;z-index:0;overflow:hidden;pointer-events:none;">
+                <svg width="100%" height="340" viewBox="0 0 1440 340" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;">
+                    <defs>
+                        <linearGradient id="heroGrad1" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#5f72ff" stop-opacity="0.22"/>
+                            <stop offset="100%" stop-color="#9a5cff" stop-opacity="0.18"/>
+                        </linearGradient>
+                        <linearGradient id="heroGrad2" x1="0" y1="1" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#232946" stop-opacity="0.18"/>
+                            <stop offset="100%" stop-color="#5f72ff" stop-opacity="0.12"/>
+                        </linearGradient>
+                    </defs>
+                    <ellipse id="hero-ell1" cx="900" cy="120" rx="420" ry="110" fill="url(#heroGrad1)"/>
+                    <ellipse id="hero-ell2" cx="400" cy="220" rx="320" ry="80" fill="url(#heroGrad2)"/>
+                </svg>
+            </div>
+            <script>
+            // Parallax effect for SVG ellipses
+            document.addEventListener('mousemove', function(e) {
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                const ell1 = document.getElementById('hero-ell1');
+                const ell2 = document.getElementById('hero-ell2');
+                if (ell1 && ell2) {
+                    ell1.setAttribute('cx', 900 + 40 * (x - 0.5));
+                    ell1.setAttribute('cy', 120 + 20 * (y - 0.5));
+                    ell2.setAttribute('cx', 400 + 30 * (0.5 - x));
+                    ell2.setAttribute('cy', 220 + 15 * (0.5 - y));
+                }
+            });
+            // Floating animation for hero content
+            document.addEventListener('DOMContentLoaded', function() {
+                const hero = document.querySelector('.hero-3d');
+                if (hero) {
+                    hero.style.transition = 'transform 1.2s cubic-bezier(.25,.8,.25,1)';
+                    let t = 0;
+                    function float() {
+                        t += 0.02;
+                        hero.style.transform = `translateY(${Math.sin(t)*8}px)`;
+                        requestAnimationFrame(float);
+                    }
+                    float();
+                }
+            });
+            </script>
         </div>
     </header>
 
@@ -52,42 +132,35 @@
             <div class="row justify-content-center">
                 <div class="col-md-10">
                     <div class="text-center mb-5">
-                        <h2>About TrustMark Protocol</h2>
-                        <p class="lead text-muted">Enhancing trust in the Ethereum ecosystem through transaction analysis</p>
+                        <h2 data-aos="fade-up">About TrustMark Protocol</h2>
+                        <p class="lead text-muted" data-aos="fade-up" data-aos-delay="100">Enhancing trust in the Ethereum ecosystem through transaction analysis</p>
                     </div>
-                    
                     <div class="row g-4">
                         <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm">
-                                <div class="card-body text-center">
+                            <div class="glass-card h-100 p-4 text-center" data-aos="fade-right">
                                     <div class="mb-3">
                                         <i class="fa fa-search fa-3x text-primary"></i>
                                     </div>
                                     <h3 class="card-title h5">Transaction Analysis</h3>
                                     <p class="card-text">We analyze Ethereum wallet transactions to identify patterns and behaviors.</p>
-                                </div>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm">
-                                <div class="card-body text-center">
+                            <div class="glass-card h-100 p-4 text-center" data-aos="zoom-in">
                                     <div class="mb-3">
                                         <i class="fa fa-tags fa-3x text-primary"></i>
                                     </div>
                                     <h3 class="card-title h5">Address Classification</h3>
                                     <p class="card-text">Classify addresses into categories like Rookie, Whale Trader, Bot, and more.</p>
-                                </div>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm">
-                                <div class="card-body text-center">
+                            <div class="glass-card h-100 p-4 text-center" data-aos="fade-left">
                                     <div class="mb-3">
                                         <i class="fa fa-flag fa-3x text-primary"></i>
                                     </div>
                                     <h3 class="card-title h5">Flag Suspicious Activity</h3>
                                     <p class="card-text">Mark suspicious transactions and help protect the community.</p>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -99,7 +172,7 @@
     <section class="py-5 bg-dark text-white">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6">
+                <div class="col-md-6" data-aos="fade-right">
                     <h2>Identify Wallet Categories</h2>
                     <p class="lead">Our advanced classification system can identify:</p>
                     <ul class="list-group list-group-flush bg-transparent mb-4">
@@ -127,9 +200,8 @@
                     </ul>
                     <a href="{{ url_for('login') }}" class="btn btn-outline-light">Try It Now</a>
                 </div>
-                <div class="col-md-6">
-                    <div class="card bg-secondary">
-                        <div class="card-body p-4">
+                <div class="col-md-6" data-aos="fade-left">
+                    <div class="glass-card p-4">
                             <h4>Chrome Extension</h4>
                             <p>Protect yourself while browsing Web3 sites with our Chrome extension.</p>
                             <ul>
@@ -137,10 +209,9 @@
                                 <li>Display reputation tags on hover</li>
                                 <li>Flag suspicious addresses</li>
                             </ul>
-                            <a href="{{ url_for('static', filename='chrome_extension.zip') }}" class="btn btn-primary">
+                        <a href="{{ url_for('static', filename='chrome_extension.zip') }}" class="btn btn-3d">
                                 <i class="fa fa-download me-2"></i>Download Extension
                             </a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -154,6 +225,40 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Init AOS
+        AOS.init({
+            duration: 900,
+            once: true,
+            offset: 80
+        });
+        // Animated counters
+        function animateCounter(id, end, duration) {
+            let start = 0;
+            const step = Math.ceil(end / (duration / 16));
+            const el = document.getElementById(id);
+            function update() {
+                start += step;
+                if (start >= end) {
+                    el.textContent = end;
+                } else {
+                    el.textContent = start;
+                    requestAnimationFrame(update);
+                }
+            }
+            update();
+        }
+        animateCounter('counter-users', 1200, 1200);
+        animateCounter('counter-tx', 48000, 1200);
+        animateCounter('counter-flags', 320, 1200);
+        // Dark/Light mode toggle
+        const toggleBtn = document.getElementById('toggleMode');
+        toggleBtn.addEventListener('click', function() {
+            document.body.classList.toggle('light-mode');
+            this.innerHTML = document.body.classList.contains('light-mode') ? '<i class="fa fa-sun"></i>' : '<i class="fa fa-moon"></i>';
+        });
+    </script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+
+
 Create a full-stack DApp called **TrustMark** from scratch using Flask and HTML/CSS.
 
 🎯 Goal:
@@ -35,9 +37,9 @@ TrustMark is a decentralized reputation tagging platform that:
 - Welcome to TrustMark
 - Brief about the protocol
 - Buttons:
-  - “Login” → `/login`
-  - “View Dashboard”
-  - “Download Extension” (just link for now)
+  - "Login" → `/login`
+  - "View Dashboard"
+  - "Download Extension" (just link for now)
 
 ---
 
@@ -59,7 +61,7 @@ TrustMark is a decentralized reputation tagging platform that:
   - ⚠️ Button to **flag this transaction**
 
 ### 🚩 Flagging System
-- Each transaction row should have a “Flag” button
+- Each transaction row should have a "Flag" button
 - Clicking it sends a POST request to `/flag_tx`
 - Store flagged status and show a ✅ next to flagged rows
 
@@ -69,9 +71,9 @@ TrustMark is a decentralized reputation tagging platform that:
 - tx_count < 5 → "Rookie"
 - >10 contract calls → "Bot"
 - volume > 100,000 → "Whale Trader"
-- note = “airdrop” → "Airdrop Hunter"
-- note = “exploit” → "Hacker"
-- note = “audit” → "Whitehat"
+- note = "airdrop" → "Airdrop Hunter"
+- note = "exploit" → "Hacker"
+- note = "audit" → "Whitehat"
 
 ---
 
@@ -93,7 +95,7 @@ TrustMark is a decentralized reputation tagging platform that:
 
 📌 Requirements:
 - Use mock transaction data in `blockchain.py`
-- Flagging doesn’t need DB, just store in memory for now
+- Flagging doesn't need DB, just store in memory for now
 - Dashboard should show category beside each transaction
 - UI must be clean and functional
 

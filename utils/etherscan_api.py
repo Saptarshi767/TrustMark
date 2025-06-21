@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 # Constants
 ETHERSCAN_API_URL = "https://api.etherscan.io/api"
-API_KEY = os.environ.get("ETHERSCAN_API_KEY")
+API_KEY = os.environ.get("ETHERSCAN_API_KEY", "IRI57XAY533YXUSDTU9J9TU6ZY9B4IWSRS")
 
 def convert_timestamp(timestamp):
     """Convert Unix timestamp to datetime object"""

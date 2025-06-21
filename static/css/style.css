@@ -267,7 +267,7 @@ body {
 .btn-3d {
     background: linear-gradient(135deg, #5f72ff 0%, #9a5cff 50%, #ff6b6b 100%);
     background-size: 200% 200%;
-    animation: gradientMove 3s ease infinite;
+    animation: gradientMove 10s ease infinite;
     color: #fff;
     border: none;
     border-radius: 16px;
@@ -363,7 +363,7 @@ body {
     border-radius: 24px;
     background: linear-gradient(135deg, #5f72ff, #9a5cff, #ff6b6b, #5f72ff);
     background-size: 300% 300%;
-    animation: borderGradient 4s ease infinite;
+    animation: borderGradient 12s ease infinite;
     padding: 2px;
 }
 
@@ -386,7 +386,7 @@ body {
 .hero-3d {
     background: linear-gradient(135deg, #232946 0%, #5f72ff 50%, #9a5cff 100%);
     background-size: 200% 200%;
-    animation: heroGradient 25s ease infinite;
+    animation: heroGradient 20s ease infinite;
     box-shadow: 
         0 20px 60px rgba(31, 38, 135, 0.3),
         0 8px 24px rgba(0, 0, 0, 0.2);

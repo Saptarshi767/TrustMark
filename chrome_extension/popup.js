@@ -2,9 +2,8 @@
  * TrustMark Chrome Extension Popup Script
  */
 
-// IMPORTANT: Replace this with your deployed Vercel URL
-// Example: https://trustmark-app.vercel.app
-const BACKEND_URL = 'https://YOUR_VERCEL_PROJECT_URL.vercel.app';
+// TrustMark Backend URL - Deployed on Vercel
+const BACKEND_URL = 'https://trust-mark.vercel.app';
 
 // Store flagged addresses
 let flaggedAddresses = [];

@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Add click handler to the new scan button
     document.getElementById('scanPageBtn').addEventListener('click', scanPageForAddresses);
   } else {
-    displayError("Could not connect to TrustMark backend. Make sure your Flask server is running on localhost:5000");
+    displayError(`Could not connect to TrustMark backend at ${BACKEND_URL}. Please check your internet connection or try again later.`);
   }
 });
 

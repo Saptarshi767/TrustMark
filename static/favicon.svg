@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5f72ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9a5cff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Shield background -->
+  <path d="M16 2L4 8v8c0 8 6 14 12 18s12-10 12-18V8L16 2z" fill="url(#shieldGradient)" stroke="#ffffff" stroke-width="1"/>
+  
+  <!-- Checkmark inside shield -->
+  <path d="M12 16l3 3 5-5" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- TM text -->
+  <text x="16" y="26" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="6" font-weight="bold">TM</text>
+</svg> 

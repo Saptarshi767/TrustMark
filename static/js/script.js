@@ -9,31 +9,8 @@ function detectMetaMask() {
 
 // Initialize the application when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Check for MetaMask
-    if (window.location.pathname.includes('login') && detectMetaMask()) {
-        // Add a "Connect with MetaMask" button if we detect MetaMask is installed
-        const loginForm = document.querySelector('form');
-        if (loginForm) {
-            const metaMaskBtn = document.createElement('button');
-            metaMaskBtn.type = 'button';
-            metaMaskBtn.className = 'btn btn-warning w-100 mb-3';
-            metaMaskBtn.innerHTML = '<i class="fa fa-external-link me-2"></i>Connect with MetaMask';
-            
-            metaMaskBtn.addEventListener('click', async function() {
-                try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const account = accounts[0];
-                    document.getElementById('wallet_address').value = account;
-                    loginForm.submit();
-                } catch (error) {
-                    console.error(error);
-                    alert('Failed to connect to MetaMask. Please try again or enter your address manually.');
-                }
-            });
-            
-            loginForm.insertBefore(metaMaskBtn, loginForm.firstChild);
-        }
-    }
+    // MetaMask integration is handled in login.html template directly
+    // No need to create duplicate buttons here
     
     // Handle transaction hovering
     const txRows = document.querySelectorAll('tr[id^="tx-"]');

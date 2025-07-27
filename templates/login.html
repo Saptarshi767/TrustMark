@@ -122,38 +122,116 @@
 
         // MetaMask login logic
         document.getElementById('metamaskLoginBtn').addEventListener('click', async function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            // Check if MetaMask is installed
             if (!window.ethereum) {
-                alert('MetaMask is not installed.');
+                alert('MetaMask is not installed. Please install MetaMask extension and try again.');
                 return;
             }
+            
             try {
-                // 1. Request account
+                // Show loading state
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connecting...';
+                
+                // 1. Request account access
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                if (!accounts || accounts.length === 0) {
+                    throw new Error('No accounts found. Please unlock MetaMask and try again.');
+                }
+                
                 const address = accounts[0];
+                console.log('Connected to MetaMask account:', address);
+                
+                // Update button text
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Getting nonce...';
+                
                 // 2. Fetch nonce from backend
-                const nonceResp = await fetch('/api/nonce?address=' + address);
+                const nonceResp = await fetch('/api/nonce?address=' + encodeURIComponent(address));
+                
+                if (!nonceResp.ok) {
+                    throw new Error(`Failed to get nonce: ${nonceResp.status} ${nonceResp.statusText}`);
+                }
+                
                 const nonceData = await nonceResp.json();
-                if (!nonceData.nonce) throw new Error('Failed to get nonce');
+                
+                if (!nonceData.nonce) {
+                    throw new Error('Invalid nonce received from server');
+                }
+                
+                // Update button text
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Please sign message...';
+                
                 // 3. Ask user to sign the nonce
                 const msg = `Sign this message to login: ${nonceData.nonce}`;
                 const signature = await window.ethereum.request({
                     method: 'personal_sign',
                     params: [msg, address],
                 });
+                
+                if (!signature) {
+                    throw new Error('Signature was cancelled or failed');
+                }
+                
+                // Update button text
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
+                
                 // 4. Send address and signature to backend
                 const authResp = await fetch('/api/authenticate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ address, signature, nonce: nonceData.nonce })
+                    body: JSON.stringify({ 
+                        address: address, 
+                        signature: signature, 
+                        nonce: nonceData.nonce 
+                    })
                 });
-                const authData = await authResp.json();
-                if (authData.success) {
-                    window.location.href = '/dashboard';
-                } else {
-                    alert('Authentication failed: ' + (authData.message || 'Unknown error'));
+                
+                if (!authResp.ok) {
+                    throw new Error(`Authentication request failed: ${authResp.status} ${authResp.statusText}`);
                 }
+                
+                const authData = await authResp.json();
+                
+                if (authData.success) {
+                    btn.innerHTML = '<i class="fa fa-check me-2"></i>Success! Redirecting...';
+                    btn.classList.remove('btn-warning');
+                    btn.classList.add('btn-success');
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    throw new Error(authData.message || 'Authentication failed');
+                }
+                
             } catch (err) {
-                alert('MetaMask login failed: ' + err.message);
+                console.error('MetaMask login error:', err);
+                
+                // Show user-friendly error message
+                let errorMsg = 'MetaMask login failed: ';
+                
+                if (err.code === 4001) {
+                    errorMsg += 'User rejected the request';
+                } else if (err.code === -32002) {
+                    errorMsg += 'Request already pending. Please check MetaMask.';
+                } else if (err.message.includes('User denied')) {
+                    errorMsg += 'User cancelled the signature request';
+                } else {
+                    errorMsg += err.message;
+                }
+                
+                alert(errorMsg);
+                
+                // Reset button
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-warning');
             }
         });
     </script>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,10 +16,12 @@
             background-color: #212529;
             color: #f8f9fa;
         }
+
         .scan-result {
             max-height: 200px;
             overflow-y: auto;
         }
+
         .address-item {
             font-family: monospace;
             font-size: 0.9rem;
@@ -28,20 +31,24 @@
             background-color: rgba(255, 255, 255, 0.1);
             word-break: break-all;
         }
+
         .badge {
             font-size: 0.7rem;
         }
+
         .footer {
             font-size: 0.8rem;
             margin-top: 10px;
             text-align: center;
         }
+
         .header-icon {
             font-size: 1.2rem;
             vertical-align: middle;
         }
     </style>
 </head>
+
 <body>
     <div class="container-fluid p-0">
         <div class="d-flex align-items-center justify-content-between mb-3">
@@ -50,17 +57,18 @@
             </h5>
             <span class="badge bg-secondary">v0.1.0</span>
         </div>
-        
+
         <div class="card bg-dark mb-3">
             <div class="card-body">
                 <h6 class="card-title">Ethereum Address Scanner</h6>
-                <p class="card-text small">Scans the current page for Ethereum addresses and provides reputation information.</p>
+                <p class="card-text small">Scans the current page for Ethereum addresses and provides reputation
+                    information.</p>
                 <button id="scanPageBtn" class="btn btn-primary btn-sm w-100">
                     <i class="fa fa-search me-1"></i> Scan Current Page
                 </button>
             </div>
         </div>
-        
+
         <div class="card bg-dark mb-3">
             <div class="card-header py-2">
                 <h6 class="m-0">Addresses Found</h6>
@@ -72,18 +80,20 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="d-grid gap-2">
-            <a href="http://localhost:5000/login" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm" id="dashboardLink">
+            <a href="http://localhost:5000/login" target="_blank" rel="noopener" class="btn btn-outline-light btn-sm"
+                id="dashboardLink">
                 <i class="fa fa-external-link me-1"></i> Open TrustMark Dashboard
             </a>
         </div>
-        
+
         <div class="footer text-muted">
             &copy; 2023 TrustMark Protocol
         </div>
     </div>
-    
+
     <script src="popup.js"></script>
 </body>
+
 </html>

@@ -395,6 +395,11 @@ def logout():
     session.pop('wallet_address', None)
     return redirect(url_for('index'))
 
+@app.route('/extension-guide')
+def extension_guide():
+    """Chrome extension installation guide"""
+    return render_template('extension_guide.html')
+
 @app.route('/api/nonce')
 def get_nonce():
     address = request.args.get('address')

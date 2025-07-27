@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrustMark Purple Extension Test</title>
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            color: #f8f9fa;
+            line-height: 1.6;
+        }
+        .container {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        h1 {
+            color: #a855f7;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+        .test-section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            background: rgba(139, 92, 246, 0.05);
+        }
+        .test-section h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #c4b5fd;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+            padding-bottom: 0.5rem;
+        }
+        .eth-address {
+            font-family: 'Courier New', monospace;
+            background: rgba(139, 92, 246, 0.2);
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+            border: 1px solid rgba(139, 92, 246, 0.4);
+        }
+        .info-box {
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .info-box.info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 5px solid #3b82f6;
+        }
+        .info-box.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 5px solid #f59e0b;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-flagged { background-color: #ef4444; }
+        .status-suspicious { background-color: #eab308; }
+        .status-normal { background-color: #8b5cf6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ TrustMark Purple Extension Test</h1>
+        
+        <div class="info-box info">
+            <strong>🧪 Test Instructions:</strong>
+            <ol style="padding-left: 20px; margin-top: 10px;">
+                <li>Ensure TrustMark Flask server is running</li>
+                <li>Install the TrustMark Chrome extension</li>
+                <li>Open the extension popup and click "Scan Current Page"</li>
+                <li>Observe the purple-themed badges on Ethereum addresses below</li>
+                <li>Check that flagged addresses show appropriate colors</li>
+            </ol>
+        </div>
+
+        <div class="info-box warning">
+            <strong>🎨 Expected Purple Theme Behavior:</strong>
+            <ul style="padding-left: 20px; margin-top: 10px;">
+                <li><span class="status-indicator status-flagged"></span><strong>Red Badges:</strong> Flagged/Hacker addresses</li>
+                <li><span class="status-indicator status-suspicious"></span><strong>Yellow Badges:</strong> Suspicious addresses</li>
+                <li><span class="status-indicator status-normal"></span><strong>Purple Badges:</strong> Normal addresses</li>
+                <li><strong>Purple Extension UI:</strong> Gradient background and purple accents</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🚨 Flagged Addresses (Should show RED badges)</h3>
+            <div class="eth-address">Hacker address: 0xDa9dfA130Df4dE4673b89022EE50ff26f6EA73Cf</div>
+            <div class="eth-address">Another flagged address: 0x742d35Cc6634C0532925a3b8D4C9db96590c6C8C</div>
+        </div>
+
+        <div class="test-section">
+            <h3>⚠️ Suspicious Addresses (Should show YELLOW badges)</h3>
+            <div class="eth-address">Suspicious activity: 0x4f655e4D5A245A6d7543867389A531A381015696</div>
+            <div class="eth-address">Questionable patterns: 0xb247d4b1548810214a3a6931448956922533e4B3</div>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Normal Addresses (Should show PURPLE badges)</h3>
+            <div class="eth-address">Vitalik Buterin: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045</div>
+            <div class="eth-address">Ethereum Foundation: 0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe</div>
+            <div class="eth-address">Random test address: 0x1A2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b</div>
+            <div class="eth-address">Another normal address: 0x00112233445566778899AABBCCDDEEFF00112233</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 Mixed Content Test</h3>
+            <p>Here's some text with embedded addresses:</p>
+            <p>Send ETH to 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045 for donations.</p>
+            <p>Avoid this suspicious address: 0x4f655e4D5A245A6d7543867389A531A381015696</p>
+            <p>This hacker address 0xDa9dfA130Df4dE4673b89022EE50ff26f6EA73Cf should be flagged.</p>
+        </div>
+
+        <div class="info-box info">
+            <strong>🔍 Testing Checklist:</strong>
+            <ul style="padding-left: 20px; margin-top: 10px;">
+                <li>✅ Extension popup has purple gradient background</li>
+                <li>✅ Purple badges appear on normal addresses</li>
+                <li>✅ Red badges appear on flagged addresses</li>
+                <li>✅ Yellow badges appear on suspicious addresses</li>
+                <li>✅ Extension correctly identifies all addresses on page</li>
+                <li>✅ Database flagging system works with extension</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // Add some dynamic content for testing
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🛡️ TrustMark test page loaded');
+            console.log('📊 Ethereum addresses on this page should be detected by the extension');
+            
+            // Count addresses for testing
+            const addresses = document.body.innerText.match(/0x[a-fA-F0-9]{40}/g);
+            if (addresses) {
+                console.log(`🔍 Found ${addresses.length} Ethereum addresses on page:`, addresses);
+            }
+        });
+    </script>
+</body>
+</html>

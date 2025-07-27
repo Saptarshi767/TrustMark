@@ -676,3 +676,41 @@ body.light-mode .btn-3d {
     opacity: 1;
     transform: translateY(0);
 }
+/* Purple button styling for Chrome extension download */
+.btn-purple {
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.btn-purple:hover {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+.btn-purple:focus {
+    box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.5);
+}
+
+/* Chrome extension highlight section */
+.extension-highlight {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1));
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.extension-highlight h3 {
+    color: #8b5cf6;
+    font-weight: 600;
+}
+
+.extension-highlight .feature-icon {
+    color: #a855f7;
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}

@@ -13,7 +13,7 @@
             min-height: 300px;
             padding: 10px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background-color: #212529;
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
             color: #f8f9fa;
         }
 
@@ -27,13 +27,26 @@
             font-size: 0.9rem;
             padding: 8px;
             margin-bottom: 5px;
-            border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
             word-break: break-all;
         }
 
         .badge {
             font-size: 0.7rem;
+        }
+
+        .badge.bg-danger {
+            background: linear-gradient(90deg, #dc2626, #ef4444) !important;
+        }
+
+        .badge.bg-warning {
+            background: linear-gradient(90deg, #f59e0b, #eab308) !important;
+        }
+
+        .badge.bg-secondary {
+            background: linear-gradient(90deg, #8b5cf6, #a855f7) !important;
         }
 
         .footer {
@@ -45,6 +58,31 @@
         .header-icon {
             font-size: 1.2rem;
             vertical-align: middle;
+            color: #a855f7 !important;
+        }
+
+        .card {
+            background: rgba(139, 92, 246, 0.1) !important;
+            border: 1px solid rgba(139, 92, 246, 0.3) !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #8b5cf6, #a855f7);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #7c3aed, #9333ea);
+        }
+
+        .btn-outline-light {
+            border-color: #a855f7;
+            color: #a855f7;
+        }
+
+        .btn-outline-light:hover {
+            background-color: #a855f7;
+            border-color: #a855f7;
         }
     </style>
 </head>

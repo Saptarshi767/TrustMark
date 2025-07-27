@@ -2,24 +2,25 @@
  * TrustMark Chrome Extension Popup Script
  */
 
-// TrustMark Backend URL - Deployed on Vercel
-const BACKEND_URL = 'https://trust-mark.vercel.app';
+// TrustMark Backend URL - Use localhost for testing, Vercel for production
+const BACKEND_URL = 'http://localhost:5000'; // Change to 'https://trust-mark.vercel.app' for production
 
 // Store flagged addresses
 let flaggedAddresses = [];
 let suspiciousAddresses = [];
 
-// Category badge classes
+// Category badge classes with purple theme
 const categoryClasses = {
   'Rookie': 'bg-secondary',
-  'Whale Trader': 'bg-primary',
+  'Whale Trader': 'bg-primary', 
   'Bot': 'bg-info',
   'Hacker': 'bg-danger',
   'Whitehat': 'bg-success',
   'Airdrop Hunter': 'bg-warning',
   'Liquidity Provider': 'bg-info',
   'Flagged': 'bg-danger',
-  'Suspicious': 'bg-warning'
+  'Suspicious': 'bg-warning',
+  'Normal': 'bg-secondary'
 };
 
 // Fetch flagged addresses from backend

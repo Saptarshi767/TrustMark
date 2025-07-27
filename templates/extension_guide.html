@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Extension Guide - TrustMark</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        .step-card {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        
+        .feature-badge {
+            background: linear-gradient(90deg, #8b5cf6, #a855f7);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin: 0.25rem;
+            display: inline-block;
+        }
+        
+        .screenshot-placeholder {
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px dashed rgba(139, 92, 246, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            color: #a855f7;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fa fa-shield me-2"></i>TrustMark
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Extension Guide</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 fw-bold mb-3">
+                        <i class="fa fa-chrome text-primary me-3"></i>
+                        TrustMark Chrome Extension
+                    </h1>
+                    <p class="lead">Purple-themed browser extension for real-time Ethereum address reputation</p>
+                    
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <a href="{{ url_for('static', filename='trustmark_chrome_extension.zip') }}" class="btn btn-purple btn-lg">
+                            <i class="fa fa-download me-2"></i>Download Extension
+                        </a>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fa fa-home me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Features Section -->
+                <div class="extension-highlight mb-5">
+                    <h3 class="mb-4">
+                        <i class="fa fa-star feature-icon"></i>Extension Features
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="feature-badge">🟣 Purple Theme</div>
+                            <div class="feature-badge">🔍 Address Detection</div>
+                            <div class="feature-badge">🔴 Flagged Addresses</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-badge">🟡 Suspicious Alerts</div>
+                            <div class="feature-badge">⚡ Real-time Scanning</div>
+                            <div class="feature-badge">🛡️ Blockchain Security</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Installation Steps -->
+                <h2 class="mb-4">
+                    <i class="fa fa-cogs me-2 text-primary"></i>Installation Guide
+                </h2>
+
+                <div class="step-card">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number">1</div>
+                        <div>
+                            <h5>Download the Extension</h5>
+                            <p class="mb-2">Click the download button above to get the latest version of TrustMark Chrome Extension.</p>
+                            <div class="screenshot-placeholder">
+                                <i class="fa fa-download fa-3x mb-2"></i>
+                                <p>trustmark_chrome_extension.zip</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number">2</div>
+                        <div>
+                            <h5>Extract the ZIP File</h5>
+                            <p class="mb-2">Extract the downloaded ZIP file to a folder on your computer. Remember the location!</p>
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle me-2"></i>
+                                <strong>Tip:</strong> Create a dedicated folder like "TrustMark Extension" in your Documents.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number">3</div>
+                        <div>
+                            <h5>Open Chrome Extensions</h5>
+                            <p class="mb-2">In Google Chrome, navigate to:</p>
+                            <code class="d-block p-2 bg-dark rounded mb-2">chrome://extensions/</code>
+                            <p>Or go to <strong>Menu → More Tools → Extensions</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number">4</div>
+                        <div>
+                            <h5>Enable Developer Mode</h5>
+                            <p class="mb-2">Toggle the "Developer mode" switch in the top-right corner of the extensions page.</p>
+                            <div class="screenshot-placeholder">
+                                <i class="fa fa-toggle-on fa-2x mb-2"></i>
+                                <p>Developer mode: ON</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number">5</div>
+                        <div>
+                            <h5>Load Unpacked Extension</h5>
+                            <p class="mb-2">Click "Load unpacked" and select the folder where you extracted the extension files.</p>
+                            <div class="alert alert-warning">
+                                <i class="fa fa-exclamation-triangle me-2"></i>
+                                <strong>Important:</strong> Select the folder containing manifest.json, not the ZIP file itself.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number">6</div>
+                        <div>
+                            <h5>Verify Installation</h5>
+                            <p class="mb-2">You should see the TrustMark extension appear in your extensions list with a purple shield icon.</p>
+                            <div class="screenshot-placeholder">
+                                <i class="fa fa-shield fa-3x mb-2" style="color: #8b5cf6;"></i>
+                                <p>TrustMark - Ethereum Reputation</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Guide -->
+                <h2 class="mb-4 mt-5">
+                    <i class="fa fa-play-circle me-2 text-primary"></i>How to Use
+                </h2>
+
+                <div class="step-card">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number">
+                            <i class="fa fa-mouse-pointer"></i>
+                        </div>
+                        <div>
+                            <h5>Click the Extension Icon</h5>
+                            <p>Click the TrustMark shield icon in your Chrome toolbar to open the purple-themed popup.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number">
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <div>
+                            <h5>Scan Current Page</h5>
+                            <p>Click "Scan Current Page" to detect all Ethereum addresses on the webpage you're viewing.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="d-flex align-items-start">
+                        <div class="step-number">
+                            <i class="fa fa-eye"></i>
+                        </div>
+                        <div>
+                            <h5>View Address Reputation</h5>
+                            <p>Addresses will be highlighted with colored badges:</p>
+                            <ul class="mt-2">
+                                <li><span class="badge bg-danger">Red</span> - Flagged/Hacker addresses</li>
+                                <li><span class="badge bg-warning">Yellow</span> - Suspicious addresses</li>
+                                <li><span class="badge" style="background: linear-gradient(90deg, #8b5cf6, #a855f7);">Purple</span> - Normal addresses</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting -->
+                <h2 class="mb-4 mt-5">
+                    <i class="fa fa-wrench me-2 text-primary"></i>Troubleshooting
+                </h2>
+
+                <div class="accordion" id="troubleshootingAccordion">
+                    <div class="accordion-item bg-dark">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                Extension not loading?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li>Make sure you extracted the ZIP file completely</li>
+                                    <li>Verify you selected the correct folder (containing manifest.json)</li>
+                                    <li>Check that Developer mode is enabled</li>
+                                    <li>Try refreshing the extensions page</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-dark">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                No addresses detected?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li>Make sure the TrustMark Flask server is running</li>
+                                    <li>Check that the page contains Ethereum addresses (0x...)</li>
+                                    <li>Try refreshing the page and scanning again</li>
+                                    <li>Open browser console (F12) to check for errors</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item bg-dark">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                Purple theme not showing?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li>Make sure you downloaded the latest version</li>
+                                    <li>Try removing and reinstalling the extension</li>
+                                    <li>Clear browser cache and reload</li>
+                                    <li>Check if you have any conflicting extensions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support Section -->
+                <div class="extension-highlight mt-5">
+                    <h3 class="mb-3">
+                        <i class="fa fa-life-ring feature-icon"></i>Need Help?
+                    </h3>
+                    <p>If you encounter any issues with the TrustMark Chrome Extension, please:</p>
+                    <ul>
+                        <li>Check the troubleshooting section above</li>
+                        <li>Ensure your TrustMark server is running</li>
+                        <li>Verify you have the latest version of Chrome</li>
+                        <li>Test with the provided test page: <code>test_extension_purple.html</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-4 bg-dark text-white-50">
+        <div class="container text-center">
+            <small>&copy; 2023 TrustMark Protocol | <a href="#" class="text-white">Terms</a> | <a href="#" class="text-white">Privacy</a></small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -52,6 +52,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('search') }}">Search</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('extension_guide') }}">
+                            <i class="fa fa-chrome me-1"></i>Extension
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -68,8 +73,8 @@
                 <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-lg" title="View your dashboard">
                     <i class="fa fa-dashboard me-2"></i>View Dashboard
                 </a>
-                <a href="{{ url_for('static', filename='chrome_extension.zip') }}" class="btn btn-secondary btn-lg" title="Download the Chrome extension">
-                    <i class="fa fa-download me-2"></i>Download Extension
+                <a href="{{ url_for('static', filename='trustmark_chrome_extension.zip') }}" class="btn btn-purple btn-lg" title="Download the purple-themed Chrome extension">
+                    <i class="fa fa-download me-2"></i>Download Purple Extension
                 </a>
             </div>
             <div class="row justify-content-center mt-5">

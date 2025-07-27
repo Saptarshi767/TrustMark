@@ -8,14 +8,14 @@
  */
 (function() {
     const ethAddressRegex = /0x[a-fA-F0-9]{40}/g;
-    const BACKEND_URL = 'https://trust-mark.vercel.app';
+    const BACKEND_URL = 'http://localhost:5000'; // Change to 'https://trust-mark.vercel.app' for production
     let flaggedAddresses = [];
     let suspiciousAddresses = [];
 
     const badgeStyles = {
-        normal: `background: linear-gradient(90deg, #5f72ff, #9a5cff);`,
-        flagged: `background: linear-gradient(90deg, #ff4757, #ff3742);`,
-        suspicious: `background: linear-gradient(90deg, #ffa502, #ff9500);`
+        normal: `background: linear-gradient(90deg, #8b5cf6, #a855f7);`,
+        flagged: `background: linear-gradient(90deg, #dc2626, #ef4444);`,
+        suspicious: `background: linear-gradient(90deg, #f59e0b, #eab308);`
     };
 
     function createBadge(status) {

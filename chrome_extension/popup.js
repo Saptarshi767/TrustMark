@@ -2,8 +2,8 @@
  * TrustMark Chrome Extension Popup Script
  */
 
-// TrustMark Backend URL - Use localhost for testing, Vercel for production
-const BACKEND_URL = 'http://localhost:5000'; // Change to 'https://trust-mark.vercel.app' for production
+// TrustMark Backend URL - Production deployment with Neon database
+const BACKEND_URL = 'https://trust-mark.vercel.app';
 
 // Store flagged addresses
 let flaggedAddresses = [];

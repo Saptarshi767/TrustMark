@@ -8,7 +8,7 @@
  */
 (function() {
     const ethAddressRegex = /0x[a-fA-F0-9]{40}/g;
-    const BACKEND_URL = 'http://localhost:5000'; // Change to 'https://trust-mark.vercel.app' for production
+    const BACKEND_URL = 'https://trust-mark.vercel.app';
     let flaggedAddresses = [];
     let suspiciousAddresses = [];
 

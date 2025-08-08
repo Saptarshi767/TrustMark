@@ -26,13 +26,14 @@ def after_request(response):
     return response
 
 # --- Database Configuration ---
-# Use Vercel Postgres URL if available (for production), otherwise use local SQLite
-if os.environ.get("POSTGRES_URL"):
-    # In production, use the Vercel Postgres database
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("POSTGRES_URL").replace("postgres://", "postgresql://")
-    print("Connecting to Vercel Postgres DB.")
+# Use Neon PostgreSQL database for production
+database_url = os.environ.get("DATABASE_URL")
+if database_url:
+    # Use Neon PostgreSQL database
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    print("Connecting to Neon PostgreSQL database.")
 else:
-    # For local development, use SQLite
+    # Fallback to local SQLite for development
     db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'trustmark.db')
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"

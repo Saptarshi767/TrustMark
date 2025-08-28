@@ -1,23 +1,17 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "app.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3.11" }
+  "functions": {
+    "app.py": {
+      "runtime": "python3.11",
+      "maxDuration": 30
     }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/app.py"
-    }
-  ],
-  "env": {
-    "ETHERSCAN_API_KEY": "@etherscan_api_key",
-    "DATABASE_URL": "@database_url", 
-    "SESSION_SECRET": "@session_secret"
   },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/app.py"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

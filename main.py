@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trustmark-dev-secret")
 
-# Add secure CORS support for Chrome extension
+# Add CORS support for Chrome extension
 @app.after_request
 def after_request(response):
     # Only allow requests from the extension and the app itself
@@ -37,11 +37,7 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     
-    # Add security headers
-    response.headers.add('X-Content-Type-Options', 'nosniff')
-    response.headers.add('X-Frame-Options', 'DENY')
-    response.headers.add('X-XSS-Protection', '1; mode=block')
-    response.headers.add('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+    # Add CSP header (security headers are handled by vercel.json)
     response.headers.add('Content-Security-Policy', 
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "

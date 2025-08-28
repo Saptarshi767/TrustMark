@@ -2,21 +2,22 @@
 
 ## Issues Fixed
 
-### 1. **WSGI Entry Point**
-- Created `app.py` as the main WSGI entry point for Vercel
-- Updated `vercel.json` to use `app.py` instead of `main.py`
+### 1. **Mixed Routing Properties Error**
+- **CRITICAL FIX**: Removed conflicting `routes` and `headers` properties from `vercel.json`
+- Updated to use newer `functions` and `rewrites` configuration
+- This was the main cause of deployment failure
 
-### 2. **Python Runtime**
+### 2. **WSGI Entry Point**
+- Created `app.py` as the main WSGI entry point for Vercel
+- Updated `vercel.json` to use `functions` instead of `builds`
+
+### 3. **Python Runtime**
 - Updated Python runtime from 3.9 to 3.11 in `vercel.json`
 - Added specific version pins to `requirements.txt`
 
-### 3. **Database Initialization**
+### 4. **Database Initialization**
 - Fixed database table creation for production deployment
 - Added proper error handling for database initialization
-
-### 4. **Environment Variables**
-- Added environment variable configuration in `vercel.json`
-- Created proper fallback handling for missing variables
 
 ### 5. **Package Structure**
 - Added `utils/__init__.py` to make utils a proper Python package
@@ -25,12 +26,12 @@
 ### 6. **Deployment Configuration**
 - Created `.vercelignore` to exclude unnecessary files
 - Added health check endpoint at `/health`
-- Added proper CORS and security headers
+- Separated CORS and security headers properly
 
 ## Files Modified
 
-- `vercel.json` - Updated build configuration and routes
-- `main.py` - Added app factory pattern and database initialization
+- `vercel.json` - **CRITICAL**: Fixed mixed routing properties error, updated to use `functions` and `rewrites`
+- `main.py` - Added app factory pattern, removed duplicate security headers
 - `requirements.txt` - Added version pins for dependencies
 - `app.py` - **NEW** - WSGI entry point for Vercel
 - `utils/__init__.py` - **NEW** - Package initialization
@@ -38,11 +39,13 @@
 
 ## Environment Variables Required in Vercel
 
-Set these in your Vercel dashboard:
+Set these in your Vercel dashboard (not in vercel.json):
 
 1. `ETHERSCAN_API_KEY` - Your Etherscan API key
 2. `DATABASE_URL` - Your Neon PostgreSQL connection string  
 3. `SESSION_SECRET` - A secure random string for sessions
+
+**Note**: Don't use the `@variable_name` syntax in vercel.json - set these directly in Vercel dashboard.
 
 ## Deployment Steps
 

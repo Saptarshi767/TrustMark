@@ -1,0 +1,24 @@
+{
+  "timestamp": "2024-01-01T00:00:00Z",
+  "site": "https://trust-mark.vercel.app",
+  "security_measures": [
+    "\u2705 HTTPS enforcement (Strict-Transport-Security)",
+    "\u2705 Content Security Policy implemented",
+    "\u2705 XSS protection headers",
+    "\u2705 Clickjacking protection (X-Frame-Options)",
+    "\u2705 MIME sniffing protection",
+    "\u2705 Cross-origin isolation policies",
+    "\u2705 Server information hiding",
+    "\u2705 Security.txt file for researchers",
+    "\u2705 Robots.txt with security information",
+    "\u2705 Security policy page",
+    "\u2705 Input validation and sanitization",
+    "\u2705 Rate limiting protection"
+  ],
+  "compliance": {
+    "OWASP_Top_10": "Addressed",
+    "Google_Safe_Browsing": "Compliant",
+    "Security_Headers": "A+ Grade Target",
+    "SSL_Labs": "A+ Grade Target"
+  }
+}

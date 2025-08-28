@@ -5,27 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - TrustMark</title>
     
-    <!-- Security Meta Tags -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.svg') }}">
     
-    <!-- Bootstrap CSS with integrity check -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
-          rel="stylesheet" 
-          integrity="sha384-9ndCyUa6c3+0e1Xc0tHeTBFQUa+b4GL3FbdcjxUlFBXxxtykrrXPKfX6pkwBQJ8P" 
-          crossorigin="anonymous">
-    <!-- Font Awesome with integrity check -->
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" 
-          rel="stylesheet" 
-          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" 
-          crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
@@ -103,48 +91,21 @@
                             
                             <div class="alert alert-info">
                                 <i class="fa fa-shield me-2"></i>
-                                <strong>Secure & Private:</strong> We only analyze public blockchain data. No private keys, passwords, or personal information required. All connections are encrypted.
-                            </div>
-                            
-                            <div class="alert alert-success">
-                                <i class="fa fa-lock me-2"></i>
-                                <strong>Security Features:</strong>
-                                <ul class="mb-0 mt-2">
-                                    <li>End-to-end encryption</li>
-                                    <li>No data storage of private information</li>
-                                    <li>Rate limiting protection</li>
-                                    <li>Input validation and sanitization</li>
-                                </ul>
+                                <strong>Read-Only Analysis:</strong> We only analyze public blockchain data. No private keys or personal information required.
                             </div>
                         </div>
                         
-                                        <form action="{{ url_for('login') }}" method="post" autocomplete="off" id="loginForm">
-                            <!-- CSRF Protection -->
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
-                            
+                        <form action="{{ url_for('login') }}" method="post">
                             <div class="mb-3">
                                 <label for="wallet_address" class="form-label">Ethereum Wallet Address</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="fa fa-ethereum"></i>
                                     </span>
-                                    <input type="text" 
-                                           class="form-control" 
-                                           id="wallet_address" 
-                                           name="wallet_address" 
-                                           placeholder="0x..." 
-                                           required 
-                                           autocomplete="off"
-                                           spellcheck="false"
-                                           pattern="^0x[a-fA-F0-9]{40}$"
-                                           maxlength="42"
-                                           data-original-value=""
-                                           title="Enter a valid Ethereum address (42 characters starting with 0x)">
+                                    <input type="text" class="form-control" id="wallet_address" name="wallet_address" 
+                                           placeholder="0x..." required>
                                 </div>
-                                <div class="form-text">Enter a valid Ethereum address (starts with 0x, 42 characters total).</div>
-                                <div class="invalid-feedback">
-                                    Please enter a valid Ethereum address (42 characters starting with 0x).
-                                </div>
+                                <div class="form-text">Enter a valid Ethereum address (starts with 0x).</div>
                             </div>
                             
                             <div class="d-grid gap-2 mb-3">
@@ -185,10 +146,8 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
-            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" 
-            crossorigin="anonymous"></script>
-    <script nonce="{{ csp_nonce if csp_nonce else '' }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
         // Network configurations
         const SUPPORTED_NETWORKS = {
             '0x1': 'Ethereum Mainnet',
@@ -295,118 +254,29 @@
             }
         }
 
-        // Input validation and sanitization
-        function validateEthereumAddress(address) {
-            // Remove whitespace and convert to lowercase
-            address = address.trim().toLowerCase();
-            
-            // Check format: 0x followed by 40 hex characters
-            const ethAddressRegex = /^0x[a-f0-9]{40}$/;
-            return ethAddressRegex.test(address);
-        }
-        
-        // Real-time validation for wallet address input
-        document.getElementById('wallet_address').addEventListener('input', function(e) {
-            const input = e.target;
-            const value = input.value.trim();
-            
-            // Remove invalid characters
-            const sanitized = value.replace(/[^0-9a-fA-Fx]/g, '');
-            if (sanitized !== value) {
-                input.value = sanitized;
-            }
-            
-            // Visual feedback
-            if (value.length > 0) {
-                if (validateEthereumAddress(value)) {
-                    input.classList.remove('is-invalid');
-                    input.classList.add('is-valid');
-                } else {
-                    input.classList.remove('is-valid');
-                    input.classList.add('is-invalid');
-                }
-            } else {
-                input.classList.remove('is-valid', 'is-invalid');
-            }
-        });
-
         // Demo address button - for easy testing
         document.getElementById('demoAddressBtn').addEventListener('click', function() {
-            const demoAddress = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
-            document.getElementById('wallet_address').value = demoAddress;
-            
-            // Trigger validation
-            document.getElementById('wallet_address').dispatchEvent(new Event('input'));
-            
-            // Submit the form automatically after a short delay
-            setTimeout(() => {
-                this.closest('form').submit();
-            }, 500);
-        });
-
-        // Form submission security
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            const walletInput = document.getElementById('wallet_address');
-            const address = walletInput.value.trim();
-            
-            // Final validation before submission
-            if (!validateEthereumAddress(address)) {
-                e.preventDefault();
-                walletInput.classList.add('is-invalid');
-                alert('Please enter a valid Ethereum address before submitting.');
-                return false;
-            }
-            
-            // Sanitize the input value
-            walletInput.value = address.toLowerCase();
-            
-            // Disable form to prevent double submission
-            const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connecting...';
-            }
-            
-            return true;
+            document.getElementById('wallet_address').value = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
+            // Submit the form automatically
+            this.closest('form').submit();
         });
 
         // Initialize wallet status when page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Small delay to ensure MetaMask is fully loaded
             setTimeout(initializeWallet, 100);
-            
-            // Store original input value for security comparison
-            const walletInput = document.getElementById('wallet_address');
-            walletInput.setAttribute('data-original-value', walletInput.value);
         });
 
-        // Security: Rate limiting for MetaMask attempts
-        let metamaskAttempts = 0;
-        const MAX_METAMASK_ATTEMPTS = 3;
-        const ATTEMPT_RESET_TIME = 60000; // 1 minute
-        
-        // MetaMask login logic with enhanced security
+        // MetaMask login logic
         document.getElementById('metamaskLoginBtn').addEventListener('click', async function() {
             const btn = this;
             const originalText = btn.innerHTML;
-            
-            // Rate limiting check
-            if (metamaskAttempts >= MAX_METAMASK_ATTEMPTS) {
-                alert('Too many MetaMask connection attempts. Please wait a minute before trying again.');
-                return;
-            }
             
             // Check if MetaMask is installed
             if (!window.ethereum) {
                 alert('MetaMask is not installed. Please install MetaMask extension and try again.');
                 return;
             }
-            
-            // Increment attempt counter
-            metamaskAttempts++;
-            setTimeout(() => {
-                metamaskAttempts = Math.max(0, metamaskAttempts - 1);
-            }, ATTEMPT_RESET_TIME);
             
             try {
                 // Show loading state
@@ -426,19 +296,8 @@
                 // Update button text
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Getting nonce...';
                 
-                // 2. Fetch nonce from backend with timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-                
-                const nonceResp = await fetch('/api/nonce?address=' + encodeURIComponent(address), {
-                    signal: controller.signal,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-                
-                clearTimeout(timeoutId);
+                // 2. Fetch nonce from backend
+                const nonceResp = await fetch('/api/nonce?address=' + encodeURIComponent(address));
                 
                 if (!nonceResp.ok) {
                     throw new Error(`Failed to get nonce: ${nonceResp.status} ${nonceResp.statusText}`);
@@ -467,25 +326,16 @@
                 // Update button text
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
                 
-                // 4. Send address and signature to backend with timeout
-                const authController = new AbortController();
-                const authTimeoutId = setTimeout(() => authController.abort(), 15000); // 15 second timeout
-                
+                // 4. Send address and signature to backend
                 const authResp = await fetch('/api/authenticate', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         address: address, 
                         signature: signature, 
                         nonce: nonceData.nonce 
-                    }),
-                    signal: authController.signal
+                    })
                 });
-                
-                clearTimeout(authTimeoutId);
                 
                 if (!authResp.ok) {
                     throw new Error(`Authentication request failed: ${authResp.status} ${authResp.statusText}`);

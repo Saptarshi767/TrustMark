@@ -17,42 +17,6 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trustmark-dev-secret")
 
-# Security middleware
-@app.before_request
-def security_middleware():
-    """Enhanced security checks before processing requests"""
-    
-    # Block requests with suspicious user agents
-    user_agent = request.headers.get('User-Agent', '').lower()
-    suspicious_agents = ['bot', 'crawler', 'spider', 'scraper']
-    
-    # Allow legitimate bots but block malicious ones
-    if any(agent in user_agent for agent in suspicious_agents):
-        if not any(legit in user_agent for legit in ['googlebot', 'bingbot', 'slurp']):
-            from flask import abort
-            abort(403)
-    
-    # Rate limiting by IP for sensitive endpoints
-    if request.endpoint in ['login', 'get_nonce', 'authenticate']:
-        client_ip = request.remote_addr
-        rate_key = f"requests_{client_ip}_{request.endpoint}"
-        
-        # Get current request count
-        current_count = session.get(rate_key, 0)
-        
-        # Different limits for different endpoints
-        limits = {
-            'login': 20,      # 20 login page requests per session
-            'get_nonce': 10,  # 10 nonce requests per session  
-            'authenticate': 5  # 5 auth attempts per session
-        }
-        
-        if current_count >= limits.get(request.endpoint, 10):
-            from flask import abort
-            abort(429)  # Too Many Requests
-        
-        session[rate_key] = current_count + 1
-
 # Add CORS support for Chrome extension
 @app.after_request
 def after_request(response):
@@ -73,19 +37,16 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     
-    # Add strict security headers with nonce for inline scripts
-    nonce = secrets.token_urlsafe(16)
+    # Add strict security headers
     response.headers.add('Content-Security-Policy', 
-        f"default-src 'self'; "
-        f"script-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net; "
-        f"style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
-        f"img-src 'self' data: https://cdn.iconscout.com; "
-        f"connect-src 'self' https://api.etherscan.io; "
-        f"font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; "
-        f"frame-ancestors 'none'; "
-        f"base-uri 'self'; "
-        f"form-action 'self'; "
-        f"upgrade-insecure-requests;"
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com; "
+        "img-src 'self' data: https://cdn.iconscout.com; "
+        "connect-src 'self' https://api.etherscan.io; "
+        "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self';"
     )
     
     # Additional security headers
@@ -94,17 +55,9 @@ def after_request(response):
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Referrer-Policy', 'strict-origin-when-cross-origin')
     response.headers.add('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
-    response.headers.add('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
-    response.headers.add('Cross-Origin-Embedder-Policy', 'require-corp')
-    response.headers.add('Cross-Origin-Opener-Policy', 'same-origin')
-    response.headers.add('Cross-Origin-Resource-Policy', 'same-origin')
     
     # Remove server information
     response.headers.pop('Server', None)
-    
-    # Store nonce in Flask's g object for template access
-    from flask import g
-    g.csp_nonce = nonce
     
     return response
 
@@ -310,43 +263,16 @@ def health_check():
 def login():
     """Login page - simulates wallet connection"""
     if request.method == 'POST':
-        wallet_address = request.form.get('wallet_address', '').strip()
+        wallet_address = request.form.get('wallet_address')
         
-        # Enhanced validation for Ethereum address
-        if wallet_address:
-            # Remove any whitespace and convert to lowercase for validation
-            wallet_address = wallet_address.lower()
-            
-            # Validate Ethereum address format
-            if (wallet_address.startswith('0x') and 
-                len(wallet_address) == 42 and 
-                all(c in '0123456789abcdef' for c in wallet_address[2:])):
-                
-                # Additional security: Rate limiting check
-                session_key = f"login_attempts_{request.remote_addr}"
-                attempts = session.get(session_key, 0)
-                
-                if attempts >= 5:
-                    flash('Too many login attempts. Please try again later.', 'danger')
-                    return render_template('login.html')
-                
-                # Store the validated address
-                session['wallet_address'] = wallet_address
-                session.pop(session_key, None)  # Clear attempts on success
-                
-                return redirect(url_for('dashboard'))
-            else:
-                # Increment failed attempts
-                session[session_key] = attempts + 1
-                flash('Please enter a valid Ethereum address (42 characters starting with 0x)', 'danger')
+        # Validate Ethereum address (basic check)
+        if wallet_address and wallet_address.startswith('0x') and len(wallet_address) == 42:
+            session['wallet_address'] = wallet_address
+            return redirect(url_for('dashboard'))
         else:
-            flash('Wallet address is required', 'danger')
+            flash('Please enter a valid Ethereum address', 'danger')
     
-    # Generate CSP nonce for inline scripts
-    from flask import g
-    nonce = getattr(g, 'csp_nonce', secrets.token_urlsafe(16))
-    
-    return render_template('login.html', csp_nonce=nonce)
+    return render_template('login.html')
 
 @app.route('/dashboard')
 def dashboard():
@@ -668,115 +594,39 @@ def extension_guide():
 
 @app.route('/api/nonce')
 def get_nonce():
-    # Rate limiting check
-    client_ip = request.remote_addr
-    rate_limit_key = f"nonce_requests_{client_ip}"
-    requests_count = session.get(rate_limit_key, 0)
-    
-    if requests_count >= 10:  # Max 10 nonce requests per session
-        return jsonify({'error': 'Rate limit exceeded'}), 429
-    
-    address = request.args.get('address', '').strip().lower()
-    
-    # Enhanced validation
-    if not address or not address.startswith('0x') or len(address) != 42:
-        return jsonify({'error': 'Invalid Ethereum address format'}), 400
-    
-    # Validate hex characters
-    try:
-        int(address[2:], 16)
-    except ValueError:
-        return jsonify({'error': 'Invalid Ethereum address characters'}), 400
-    
-    # Generate secure nonce
-    nonce = secrets.token_hex(32)  # Increased entropy
-    
-    # Store with expiration (5 minutes)
+    address = request.args.get('address')
+    if not address or not address.startswith('0x'):
+        return jsonify({'error': 'Invalid address'}), 400
+    nonce = secrets.token_hex(16)
     session['siwe_nonce'] = nonce
-    session['siwe_address'] = address
-    session['nonce_timestamp'] = datetime.now().timestamp()
-    session[rate_limit_key] = requests_count + 1
-    
+    session['siwe_address'] = address.lower()
     return jsonify({'nonce': nonce})
 
 @app.route('/api/authenticate', methods=['POST'])
 def authenticate():
-    # Rate limiting check
-    client_ip = request.remote_addr
-    auth_limit_key = f"auth_attempts_{client_ip}"
-    auth_attempts = session.get(auth_limit_key, 0)
-    
-    if auth_attempts >= 5:  # Max 5 auth attempts per session
-        return jsonify({'success': False, 'message': 'Too many authentication attempts'}), 429
-    
-    # Validate request content type
-    if not request.is_json:
-        return jsonify({'success': False, 'message': 'Invalid content type'}), 400
-    
     data = request.get_json()
-    if not data:
-        return jsonify({'success': False, 'message': 'No data provided'}), 400
-    
-    address = data.get('address', '').strip().lower()
-    signature = data.get('signature', '').strip()
-    nonce = data.get('nonce', '').strip()
-    
+    address = data.get('address', '').lower()
+    signature = data.get('signature')
+    nonce = data.get('nonce')
     expected_nonce = session.get('siwe_nonce')
     expected_address = session.get('siwe_address')
-    nonce_timestamp = session.get('nonce_timestamp')
-    
-    # Increment auth attempts
-    session[auth_limit_key] = auth_attempts + 1
-    
-    # Validate all required fields
-    if not all([address, signature, nonce, expected_nonce, expected_address]):
-        return jsonify({'success': False, 'message': 'Missing required authentication data'}), 400
-    
-    # Check nonce expiration (5 minutes)
-    if nonce_timestamp and (datetime.now().timestamp() - nonce_timestamp) > 300:
-        session.pop('siwe_nonce', None)
-        session.pop('siwe_address', None)
-        session.pop('nonce_timestamp', None)
-        return jsonify({'success': False, 'message': 'Authentication nonce expired'}), 400
-    
-    # Validate nonce and address match
+    if not (address and signature and nonce and expected_nonce and expected_address):
+        return jsonify({'success': False, 'message': 'Missing data'}), 400
     if nonce != expected_nonce or address != expected_address:
-        return jsonify({'success': False, 'message': 'Authentication data mismatch'}), 400
-    
-    # Enhanced address validation
-    if not address.startswith('0x') or len(address) != 42:
-        return jsonify({'success': False, 'message': 'Invalid address format'}), 400
-    
+        return jsonify({'success': False, 'message': 'Invalid nonce or address'}), 400
+    # Verify signature
+    w3 = Web3()
+    message = f'Sign this message to login: {nonce}'
     try:
-        int(address[2:], 16)
-    except ValueError:
-        return jsonify({'success': False, 'message': 'Invalid address characters'}), 400
-    
-    # Verify signature with enhanced error handling
-    try:
-        w3 = Web3()
-        message = f'Sign this message to login: {nonce}'
-        
-        # Additional signature validation
-        if not signature.startswith('0x') or len(signature) != 132:
-            raise ValueError('Invalid signature format')
-        
         recovered = w3.eth.account.recover_message(text=message, signature=signature)
-        
     except Exception as e:
-        logging.error(f"Signature verification error: {str(e)}")
-        return jsonify({'success': False, 'message': 'Signature verification failed'}), 400
-    
+        return jsonify({'success': False, 'message': f'Signature verification failed: {str(e)}'}), 400
     if recovered.lower() != address:
-        return jsonify({'success': False, 'message': 'Signature verification failed - address mismatch'}), 400
-    
-    # Success: log in user and clear session data
+        return jsonify({'success': False, 'message': 'Signature does not match address'}), 400
+    # Success: log in user
     session['wallet_address'] = address
     session.pop('siwe_nonce', None)
     session.pop('siwe_address', None)
-    session.pop('nonce_timestamp', None)
-    session.pop(auth_limit_key, None)  # Clear auth attempts on success
-    
     return jsonify({'success': True})
 
 # For Vercel deployment

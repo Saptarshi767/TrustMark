@@ -17,12 +17,40 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trustmark-dev-secret")
 
-# Add CORS support for Chrome extension
+# Add secure CORS support for Chrome extension
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    # Only allow requests from the extension and the app itself
+    origin = request.headers.get('Origin')
+    allowed_origins = [
+        'https://trust-mark.vercel.app',
+        'chrome-extension://*'  # Allow Chrome extension
+    ]
+    
+    # Check if origin matches allowed patterns
+    if origin and any(origin.startswith(allowed.replace('*', '')) for allowed in allowed_origins):
+        response.headers.add('Access-Control-Allow-Origin', origin)
+    elif not origin:  # Same-origin requests
+        response.headers.add('Access-Control-Allow-Origin', 'https://trust-mark.vercel.app')
+    
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    
+    # Add security headers
+    response.headers.add('X-Content-Type-Options', 'nosniff')
+    response.headers.add('X-Frame-Options', 'DENY')
+    response.headers.add('X-XSS-Protection', '1; mode=block')
+    response.headers.add('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+    response.headers.add('Content-Security-Policy', 
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "img-src 'self' data: https:; "
+        "connect-src 'self' https://api.etherscan.io; "
+        "font-src 'self' https://cdn.jsdelivr.net;"
+    )
+    
     return response
 
 # --- Database Configuration ---

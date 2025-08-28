@@ -2,7 +2,7 @@
  * TrustMark Chrome Extension Popup Script
  */
 
-// TrustMark Backend URL - Production deployment with Neon database
+// TrustMark Backend URL - Production configuration
 const BACKEND_URL = 'https://trust-mark.vercel.app';
 
 // Store flagged addresses

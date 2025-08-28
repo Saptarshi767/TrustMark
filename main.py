@@ -40,11 +40,11 @@ def after_request(response):
     # Add CSP header (security headers are handled by vercel.json)
     response.headers.add('Content-Security-Policy', 
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-        "img-src 'self' data: https:; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdn.replit.com; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdn.replit.com https://fonts.googleapis.com; "
+        "img-src 'self' data: https: https://cdn.iconscout.com; "
         "connect-src 'self' https://api.etherscan.io; "
-        "font-src 'self' https://cdn.jsdelivr.net;"
+        "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com;"
     )
     
     return response

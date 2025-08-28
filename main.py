@@ -137,12 +137,79 @@ def index():
     try:
         return render_template('index.html')
     except Exception as e:
-        # Fallback if template loading fails
-        return jsonify({
-            'message': 'TrustMark API is running',
-            'error': f'Template loading failed: {str(e)}',
-            'endpoints': ['/health', '/login', '/dashboard', '/api/flagged_addresses']
-        })
+        # Fallback HTML page if template loading fails
+        return f'''
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>TrustMark - Decentralized Reputation Platform</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+            <style>
+                body {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }}
+                .hero {{ background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; }}
+                .glass-card {{ background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; }}
+            </style>
+        </head>
+        <body>
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <a class="navbar-brand" href="/">
+                        <i class="fa fa-shield me-2"></i>TrustMark
+                    </a>
+                    <div class="navbar-nav ms-auto">
+                        <a class="nav-link" href="/login">Login</a>
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                        <a class="nav-link" href="/search">Search</a>
+                    </div>
+                </div>
+            </nav>
+            
+            <div class="container mt-5">
+                <div class="hero p-5 text-white text-center">
+                    <h1 class="display-3 fw-bold mb-3">TrustMark</h1>
+                    <p class="lead mb-4">A decentralized reputation tagging platform for Ethereum</p>
+                    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
+                        <a href="/login" class="btn btn-light btn-lg">
+                            <i class="fa fa-wallet me-2"></i>Login with Wallet
+                        </a>
+                        <a href="/dashboard" class="btn btn-outline-light btn-lg">
+                            <i class="fa fa-dashboard me-2"></i>View Dashboard
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="row mt-5">
+                    <div class="col-md-4 mb-4">
+                        <div class="glass-card p-4 text-white text-center h-100">
+                            <i class="fa fa-search fa-3x mb-3"></i>
+                            <h3>Transaction Analysis</h3>
+                            <p>Advanced analysis of Ethereum wallet transactions to identify patterns and behaviors.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="glass-card p-4 text-white text-center h-100">
+                            <i class="fa fa-tags fa-3x mb-3"></i>
+                            <h3>Address Classification</h3>
+                            <p>Intelligent classification of addresses into categories like Rookie, Whale Trader, Bot, and more.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="glass-card p-4 text-white text-center h-100">
+                            <i class="fa fa-flag fa-3x mb-3"></i>
+                            <h3>Flag Suspicious Activity</h3>
+                            <p>Community-driven flagging system to mark suspicious transactions and protect users.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        </body>
+        </html>
+        '''
 
 @app.route('/health')
 def health_check():

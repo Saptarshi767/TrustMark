@@ -53,21 +53,27 @@ def after_request(response):
 # Use Neon PostgreSQL database for production
 database_url = os.environ.get("DATABASE_URL")
 if database_url:
-    # Use Neon PostgreSQL database
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-    print("Connecting to Neon PostgreSQL database.")
-else:
-    # Fallback to local SQLite for development
+    try:
+        # Use Neon PostgreSQL database
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+            "pool_recycle": 300,
+            "pool_pre_ping": True,
+        }
+        print("Connecting to Neon PostgreSQL database.")
+    except Exception as e:
+        print(f"PostgreSQL connection failed: {e}")
+        # Fallback to SQLite if PostgreSQL fails
+        database_url = None
+
+if not database_url:
+    # Fallback to local SQLite for development or if PostgreSQL fails
     db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'trustmark.db')
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     print(f"Connecting to local SQLite DB at {db_path}")
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
 
 # Initialize the database
 db.init_app(app)

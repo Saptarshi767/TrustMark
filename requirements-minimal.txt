@@ -1,6 +1,7 @@
+# Minimal requirements for Vercel deployment
 Flask
 Flask-SQLAlchemy
 python-dotenv
 web3
 psycopg2-binary
-requests 
+requests

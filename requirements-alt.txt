@@ -1,0 +1,10 @@
+# Alternative requirements with different PostgreSQL adapter
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+python-dotenv==1.0.0
+web3==6.11.1
+# Use asyncpg-based adapter instead of psycopg2
+asyncpg==0.29.0
+SQLAlchemy[asyncio]==2.0.23
+gunicorn==21.2.0
+requests==2.31.0

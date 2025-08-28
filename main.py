@@ -50,29 +50,42 @@ def after_request(response):
     return response
 
 # --- Database Configuration ---
-# Use Neon PostgreSQL database for production
-database_url = os.environ.get("DATABASE_URL")
-if database_url:
+def configure_database():
+    """Configure database with fallback options"""
+    database_url = os.environ.get("DATABASE_URL")
+    
+    if database_url:
+        try:
+            # Use Neon PostgreSQL database
+            app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+            app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+                "pool_recycle": 300,
+                "pool_pre_ping": True,
+            }
+            print("Configured Neon PostgreSQL database.")
+            return True
+        except Exception as e:
+            print(f"PostgreSQL configuration failed: {e}")
+    
+    # Fallback to SQLite
     try:
-        # Use Neon PostgreSQL database
-        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_recycle": 300,
-            "pool_pre_ping": True,
-        }
-        print("Connecting to Neon PostgreSQL database.")
+        # Use in-memory SQLite for Vercel (since file system is read-only)
+        if os.environ.get('VERCEL'):
+            app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+            print("Using in-memory SQLite database for Vercel.")
+        else:
+            # Local file-based SQLite for development
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'trustmark.db')
+            os.makedirs(os.path.dirname(db_path), exist_ok=True)
+            app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+            print(f"Using local SQLite DB at {db_path}")
+        return True
     except Exception as e:
-        print(f"PostgreSQL connection failed: {e}")
-        # Fallback to SQLite if PostgreSQL fails
-        database_url = None
+        print(f"SQLite configuration failed: {e}")
+        return False
 
-if not database_url:
-    # Fallback to local SQLite for development or if PostgreSQL fails
-    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'trustmark.db')
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
-    print(f"Connecting to local SQLite DB at {db_path}")
-
+# Configure database
+configure_database()
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize the database
@@ -528,8 +541,22 @@ def authenticate():
 # For Vercel deployment
 def create_app():
     """Application factory for production deployment"""
-    load_dotenv()
-    return app
+    try:
+        load_dotenv()
+        
+        # Initialize database tables if needed
+        with app.app_context():
+            try:
+                db.create_all()
+                print("Database tables initialized successfully")
+            except Exception as db_error:
+                print(f"Database initialization warning: {db_error}")
+                # Continue without database if it fails
+        
+        return app
+    except Exception as e:
+        print(f"Error in create_app: {e}")
+        raise
 
 # Vercel entry point
 application = create_app()

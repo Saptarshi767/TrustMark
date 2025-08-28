@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /static/
+Disallow: /api/
+
+# Educational blockchain analysis platform
+# This site is for demonstration and educational purposes only
+# No financial transactions or private key handling occurs
+
+Sitemap: https://trust-mark.vercel.app/sitemap.xml

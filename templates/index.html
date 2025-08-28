@@ -65,7 +65,11 @@
     <header class="hero-3d text-white text-center mb-5" data-aos="zoom-in">
         <div class="container">
             <h1 class="display-3 fw-bold mb-3" style="letter-spacing: 2px; text-shadow: 0 4px 8px rgba(0,0,0,0.3);">TrustMark</h1>
-            <p class="lead mb-4 fs-4" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">A decentralized reputation tagging platform for Ethereum</p>
+            <p class="lead mb-4 fs-4" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Educational Blockchain Analysis Platform</p>
+            <div class="alert alert-info mx-auto" style="max-width: 600px; background: rgba(13, 202, 240, 0.1); border: 1px solid rgba(13, 202, 240, 0.3);">
+                <i class="fa fa-info-circle me-2"></i>
+                <strong>Educational Purpose:</strong> This is a demonstration platform for blockchain transaction analysis. No real financial transactions occur on this site.
+            </div>
             <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
                 <a href="{{ url_for('login') }}" class="btn btn-3d btn-lg">
                     <i class="fa fa-wallet me-2"></i>Login with Wallet
@@ -288,9 +292,55 @@
         </div>
     </section>
 
+    <section class="py-5 bg-dark">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="glass-card p-4">
+                        <h3 class="fw-bold mb-3 text-center">
+                            <i class="fa fa-shield me-2 text-success"></i>Security & Privacy
+                        </h3>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <h5><i class="fa fa-lock me-2 text-primary"></i>Data Protection</h5>
+                                <ul class="list-unstyled small">
+                                    <li>• No private keys stored</li>
+                                    <li>• Read-only blockchain analysis</li>
+                                    <li>• No financial transactions</li>
+                                    <li>• Educational purposes only</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fa fa-eye me-2 text-info"></i>Transparency</h5>
+                                <ul class="list-unstyled small">
+                                    <li>• Open source project</li>
+                                    <li>• Public blockchain data only</li>
+                                    <li>• No personal information collected</li>
+                                    <li>• Community-driven flagging</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="fa fa-graduation-cap me-1"></i>
+                                This platform is designed for educational and research purposes to demonstrate blockchain analysis techniques.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer class="py-4 bg-dark text-white-50">
         <div class="container text-center">
-            <small>&copy; 2023 TrustMark Protocol | <a href="#" class="text-white">Terms</a> | <a href="#" class="text-white">Privacy</a></small>
+            <small>&copy; 2025 TrustMark Educational Platform | 
+                <a href="#" class="text-white">Educational Use Only</a> | 
+                <a href="#" class="text-white">Open Source</a> |
+                <a href="https://github.com" class="text-white">
+                    <i class="fa fa-github me-1"></i>Source Code
+                </a>
+            </small>
         </div>
     </footer>
 

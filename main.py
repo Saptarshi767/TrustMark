@@ -37,15 +37,27 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     
-    # Add CSP header (security headers are handled by vercel.json)
+    # Add strict security headers
     response.headers.add('Content-Security-Policy', 
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdn.replit.com; "
-        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdn.replit.com https://fonts.googleapis.com; "
-        "img-src 'self' data: https: https://cdn.iconscout.com; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com; "
+        "img-src 'self' data: https://cdn.iconscout.com; "
         "connect-src 'self' https://api.etherscan.io; "
-        "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com;"
+        "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self';"
     )
+    
+    # Additional security headers
+    response.headers.add('X-Content-Type-Options', 'nosniff')
+    response.headers.add('X-Frame-Options', 'DENY')
+    response.headers.add('X-XSS-Protection', '1; mode=block')
+    response.headers.add('Referrer-Policy', 'strict-origin-when-cross-origin')
+    response.headers.add('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+    
+    # Remove server information
+    response.headers.pop('Server', None)
     
     return response
 
@@ -210,6 +222,18 @@ def index():
         </body>
         </html>
         '''
+
+@app.route('/robots.txt')
+def robots_txt():
+    """Serve robots.txt for search engines"""
+    from flask import send_from_directory
+    return send_from_directory('static', 'robots.txt', mimetype='text/plain')
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    """Serve sitemap.xml for search engines"""
+    from flask import send_from_directory
+    return send_from_directory('static', 'sitemap.xml', mimetype='application/xml')
 
 @app.route('/health')
 def health_check():

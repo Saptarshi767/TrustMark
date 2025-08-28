@@ -56,9 +56,6 @@ def after_request(response):
     response.headers.add('Referrer-Policy', 'strict-origin-when-cross-origin')
     response.headers.add('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
     
-    # Add HSTS header for enhanced security
-    response.headers.add('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
-    
     # Remove server information
     response.headers.pop('Server', None)
     
@@ -237,12 +234,6 @@ def sitemap_xml():
     """Serve sitemap.xml for search engines"""
     from flask import send_from_directory
     return send_from_directory('static', 'sitemap.xml', mimetype='application/xml')
-
-@app.route('/.well-known/security.txt')
-def security_txt():
-    """Serve security.txt for security researchers and legitimacy"""
-    from flask import send_from_directory
-    return send_from_directory('static/.well-known', 'security.txt', mimetype='text/plain')
 
 @app.route('/health')
 def health_check():
@@ -600,16 +591,6 @@ def logout():
 def extension_guide():
     """Chrome extension installation guide"""
     return render_template('extension_guide.html')
-
-@app.route('/security-policy')
-def security_policy():
-    """Security policy page for legitimacy"""
-    return render_template('security_policy.html')
-
-@app.route('/security-acknowledgments')
-def security_acknowledgments():
-    """Security acknowledgments page"""
-    return render_template('security_acknowledgments.html')
 
 @app.route('/api/nonce')
 def get_nonce():

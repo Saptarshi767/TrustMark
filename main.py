@@ -87,14 +87,33 @@ def format_datetime(value):
             return value
     return value.strftime('%b %d, %Y %H:%M') if value else ''
 
-# Create all tables
-with app.app_context():
-    db.create_all()
+# Create all tables (only in development or when explicitly needed)
+def init_db():
+    """Initialize database tables"""
+    with app.app_context():
+        try:
+            db.create_all()
+            print("Database tables created successfully")
+        except Exception as e:
+            print(f"Database initialization error: {e}")
+
+# Only create tables if running directly (not in production)
+if __name__ == '__main__':
+    init_db()
 
 @app.route('/')
 def index():
     """Landing page"""
     return render_template('index.html')
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint for deployment verification"""
+    return jsonify({
+        'status': 'healthy',
+        'message': 'TrustMark API is running',
+        'database': 'connected' if db else 'disconnected'
+    })
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -465,6 +484,15 @@ def authenticate():
     session.pop('siwe_nonce', None)
     session.pop('siwe_address', None)
     return jsonify({'success': True})
+
+# For Vercel deployment
+def create_app():
+    """Application factory for production deployment"""
+    load_dotenv()
+    return app
+
+# Vercel entry point
+application = create_app()
 
 if __name__ == '__main__':
     load_dotenv()

@@ -2,9 +2,10 @@
 
 ## Issues Fixed
 
-### 1. **Mixed Routing Properties Error**
-- **CRITICAL FIX**: Removed conflicting `routes` and `headers` properties from `vercel.json`
-- Updated to use newer `functions` and `rewrites` configuration
+### 1. **Runtime Configuration Error**
+- **CRITICAL FIX**: Fixed invalid runtime specification in `vercel.json`
+- Changed from `functions` with `runtime: "python3.11"` to `builds` with `use: "@vercel/python"`
+- Added `runtime.txt` to specify Python version explicitly
 - This was the main cause of deployment failure
 
 ### 2. **WSGI Entry Point**
@@ -30,7 +31,8 @@
 
 ## Files Modified
 
-- `vercel.json` - **CRITICAL**: Fixed mixed routing properties error, updated to use `functions` and `rewrites`
+- `vercel.json` - **CRITICAL**: Fixed runtime configuration error, updated to use proper `@vercel/python` runtime
+- `runtime.txt` - **NEW** - Specifies Python 3.11 version explicitly
 - `main.py` - Added app factory pattern, removed duplicate security headers
 - `requirements.txt` - Added version pins for dependencies
 - `app.py` - **NEW** - WSGI entry point for Vercel

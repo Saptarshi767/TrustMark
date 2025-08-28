@@ -37,20 +37,16 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     
-    # Enhanced security headers for Google Safe Browsing compliance
-    response.headers.add('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
+    # Add strict security headers
     response.headers.add('Content-Security-Policy', 
         "default-src 'self'; "
-        "script-src 'self' https://cdn.jsdelivr.net; "
-        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com; "
         "img-src 'self' data: https://cdn.iconscout.com; "
         "connect-src 'self' https://api.etherscan.io; "
         "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; "
         "frame-ancestors 'none'; "
-        "base-uri 'self'; "
-        "form-action 'self'; "
-        "upgrade-insecure-requests; "
-        "block-all-mixed-content;"
+        "base-uri 'self';"
     )
     
     # Additional security headers
@@ -59,13 +55,9 @@ def after_request(response):
     response.headers.add('X-XSS-Protection', '1; mode=block')
     response.headers.add('Referrer-Policy', 'strict-origin-when-cross-origin')
     response.headers.add('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
-    response.headers.add('Cross-Origin-Embedder-Policy', 'require-corp')
-    response.headers.add('Cross-Origin-Opener-Policy', 'same-origin')
-    response.headers.add('Cross-Origin-Resource-Policy', 'same-origin')
     
-    # Remove server information and add security identifier
+    # Remove server information
     response.headers.pop('Server', None)
-    response.headers.add('X-Security-Policy', 'TrustMark-Secure-v1.0')
     
     return response
 
@@ -237,12 +229,6 @@ def robots_txt():
     from flask import send_from_directory
     return send_from_directory('static', 'robots.txt', mimetype='text/plain')
 
-@app.route('/.well-known/security.txt')
-def security_txt():
-    """Serve security.txt for security researchers"""
-    from flask import send_from_directory
-    return send_from_directory('static/.well-known', 'security.txt', mimetype='text/plain')
-
 @app.route('/sitemap.xml')
 def sitemap_xml():
     """Serve sitemap.xml for search engines"""
@@ -265,9 +251,6 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'message': 'TrustMark API is running',
-        'version': '1.0.0',
-        'security': 'enhanced',
-        'purpose': 'Educational blockchain analysis tool',
         'database': db_status,
         'environment': {
             'DATABASE_URL': 'set' if os.environ.get('DATABASE_URL') else 'missing',
@@ -275,67 +258,6 @@ def health_check():
             'SESSION_SECRET': 'set' if os.environ.get('SESSION_SECRET') else 'missing'
         }
     })
-
-@app.route('/security-policy')
-def security_policy():
-    """Security policy page for transparency"""
-    return render_template_string('''
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Security Policy - TrustMark</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    </head>
-    <body>
-        <div class="container mt-5">
-            <h1>TrustMark Security Policy</h1>
-            
-            <div class="alert alert-info">
-                <h4>Legitimate Educational Platform</h4>
-                <p>TrustMark is a legitimate educational tool for analyzing public Ethereum blockchain data.</p>
-            </div>
-            
-            <h2>What We Do</h2>
-            <ul>
-                <li>Analyze public blockchain transactions from Etherscan API</li>
-                <li>Classify Ethereum addresses based on transaction patterns</li>
-                <li>Provide educational insights into blockchain behavior</li>
-                <li>Offer a Chrome extension for address flagging</li>
-            </ul>
-            
-            <h2>What We DON'T Do</h2>
-            <ul>
-                <li>Store or transmit private keys</li>
-                <li>Collect personal information</li>
-                <li>Perform financial transactions</li>
-                <li>Host malicious content</li>
-                <li>Engage in phishing or scams</li>
-            </ul>
-            
-            <h2>Security Measures</h2>
-            <ul>
-                <li>HTTPS encryption for all connections</li>
-                <li>Strict Content Security Policy</li>
-                <li>Input validation and sanitization</li>
-                <li>Rate limiting protection</li>
-                <li>Security headers implementation</li>
-            </ul>
-            
-            <h2>Data Privacy</h2>
-            <p>We only access public blockchain data available through Etherscan's public API. No private or personal information is collected, stored, or transmitted.</p>
-            
-            <h2>Contact</h2>
-            <p>For security concerns or questions, please contact us through our GitHub repository.</p>
-            
-            <div class="mt-4">
-                <a href="/" class="btn btn-primary">Back to TrustMark</a>
-            </div>
-        </div>
-    </body>
-    </html>
-    ''')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

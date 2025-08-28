@@ -1,23 +1,10 @@
 User-agent: *
 Allow: /
+Allow: /static/
+Disallow: /api/
 
-# TrustMark - Ethereum Blockchain Analysis Tool
-# Educational platform for analyzing public blockchain data
-# Legitimate site - not malicious content
+# Educational blockchain analysis platform
+# This site is for demonstration and educational purposes only
+# No financial transactions or private key handling occurs
 
 Sitemap: https://trust-mark.vercel.app/sitemap.xml
-
-# Security information
-Allow: /.well-known/security.txt
-
-# Main pages
-Allow: /
-Allow: /login
-Allow: /dashboard
-Allow: /search
-Allow: /health
-
-# Block sensitive endpoints from crawling
-Disallow: /api/
-Disallow: /flag_tx
-Disallow: /logout

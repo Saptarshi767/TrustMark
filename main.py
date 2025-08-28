@@ -92,12 +92,27 @@ def format_datetime(value):
 # Create all tables (only in development or when explicitly needed)
 def init_db():
     """Initialize database tables"""
-    with app.app_context():
-        try:
+    try:
+        with app.app_context():
             db.create_all()
             print("Database tables created successfully")
-        except Exception as e:
-            print(f"Database initialization error: {e}")
+            return True
+    except Exception as e:
+        print(f"Database initialization error: {e}")
+        return False
+
+# Lazy database initialization
+def ensure_db():
+    """Ensure database is initialized, but don't fail if it's not"""
+    try:
+        # Try to query the database to see if it's working
+        with app.app_context():
+            from models import FlaggedTransaction
+            FlaggedTransaction.query.first()
+        return True
+    except Exception:
+        # If query fails, try to initialize
+        return init_db()
 
 # Only create tables if running directly (not in production)
 if __name__ == '__main__':
@@ -106,15 +121,38 @@ if __name__ == '__main__':
 @app.route('/')
 def index():
     """Landing page"""
-    return render_template('index.html')
+    try:
+        return render_template('index.html')
+    except Exception as e:
+        # Fallback if template loading fails
+        return jsonify({
+            'message': 'TrustMark API is running',
+            'error': f'Template loading failed: {str(e)}',
+            'endpoints': ['/health', '/login', '/dashboard', '/api/flagged_addresses']
+        })
 
 @app.route('/health')
 def health_check():
     """Health check endpoint for deployment verification"""
+    db_status = 'unknown'
+    try:
+        # Test database connection
+        with app.app_context():
+            result = db.session.execute(db.text('SELECT 1'))
+            result.fetchone()
+        db_status = 'connected'
+    except Exception as e:
+        db_status = f'error: {str(e)[:50]}'
+    
     return jsonify({
         'status': 'healthy',
         'message': 'TrustMark API is running',
-        'database': 'connected' if db else 'disconnected'
+        'database': db_status,
+        'environment': {
+            'DATABASE_URL': 'set' if os.environ.get('DATABASE_URL') else 'missing',
+            'ETHERSCAN_API_KEY': 'set' if os.environ.get('ETHERSCAN_API_KEY') else 'missing',
+            'SESSION_SECRET': 'set' if os.environ.get('SESSION_SECRET') else 'missing'
+        }
     })
 
 @app.route('/login', methods=['GET', 'POST'])

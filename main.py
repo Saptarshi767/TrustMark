@@ -235,6 +235,17 @@ def sitemap_xml():
     from flask import send_from_directory
     return send_from_directory('static', 'sitemap.xml', mimetype='application/xml')
 
+@app.route('/googleb5af89e05601a259.html')
+def google_verification():
+    """Serve Google Search Console verification file"""
+    return 'google-site-verification: googleb5af89e05601a259.html', 200, {'Content-Type': 'text/html'}
+
+@app.route('/.well-known/security.txt')
+def security_txt():
+    """Serve security.txt for security researchers and legitimacy"""
+    from flask import send_from_directory
+    return send_from_directory('static/.well-known', 'security.txt', mimetype='text/plain')
+
 @app.route('/health')
 def health_check():
     """Health check endpoint for deployment verification"""
@@ -591,6 +602,16 @@ def logout():
 def extension_guide():
     """Chrome extension installation guide"""
     return render_template('extension_guide.html')
+
+@app.route('/security-policy')
+def security_policy():
+    """Security policy page for legitimacy"""
+    return render_template('security_policy.html')
+
+@app.route('/security-acknowledgments')
+def security_acknowledgments():
+    """Security acknowledgments page"""
+    return render_template('security_acknowledgments.html')
 
 @app.route('/api/nonce')
 def get_nonce():
